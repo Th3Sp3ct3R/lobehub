@@ -21,9 +21,20 @@ import { identityInitialState } from '../identity/initialState';
 import { preferenceInitialState } from '../preference/initialState';
 
 const SWR_FETCH_USER_MEMORY = 'SWR_FETCH_USER_MEMORY';
+const SWR_FETCH_ACTIVITIES = 'useFetchActivities';
+const SWR_FETCH_CONTEXTS = 'useFetchContexts';
+const SWR_FETCH_EXPERIENCES = 'useFetchExperiences';
+const SWR_FETCH_IDENTITIES = 'useFetchIdentities';
+const SWR_FETCH_PREFERENCES = 'useFetchPreferences';
+const MEMORY_DETAIL_PREFIX = 'memoryDetail-';
 const n = setNamespace('userMemory');
 
 type MemoryContext = Parameters<typeof createMemorySearchParams>[0];
+
+const memoryDetailKey = (layer: LayersEnum, id: string) => `${MEMORY_DETAIL_PREFIX}${layer}-${id}`;
+
+const isStringKeyWithPrefix = (prefix: string) => (key: unknown) =>
+  typeof key === 'string' && key.startsWith(prefix);
 
 type Setter = StoreSetter<UserMemoryStore>;
 export const createBaseSlice = (set: Setter, get: () => UserMemoryStore, _api?: unknown) =>
@@ -82,24 +93,12 @@ export class BaseActionImpl {
     );
 
     await Promise.all([
-      mutate((key) => typeof key === 'string' && key.startsWith('memoryDetail-'), undefined, {
-        revalidate: true,
-      }),
-      mutate((key) => typeof key === 'string' && key.startsWith('useFetchActivities'), undefined, {
-        revalidate: true,
-      }),
-      mutate((key) => typeof key === 'string' && key.startsWith('useFetchContexts'), undefined, {
-        revalidate: true,
-      }),
-      mutate((key) => typeof key === 'string' && key.startsWith('useFetchExperiences'), undefined, {
-        revalidate: true,
-      }),
-      mutate((key) => typeof key === 'string' && key.startsWith('useFetchIdentities'), undefined, {
-        revalidate: true,
-      }),
-      mutate((key) => typeof key === 'string' && key.startsWith('useFetchPreferences'), undefined, {
-        revalidate: true,
-      }),
+      mutate(isStringKeyWithPrefix(MEMORY_DETAIL_PREFIX), undefined, { revalidate: true }),
+      mutate(isStringKeyWithPrefix(SWR_FETCH_ACTIVITIES), undefined, { revalidate: true }),
+      mutate(isStringKeyWithPrefix(SWR_FETCH_CONTEXTS), undefined, { revalidate: true }),
+      mutate(isStringKeyWithPrefix(SWR_FETCH_EXPERIENCES), undefined, { revalidate: true }),
+      mutate(isStringKeyWithPrefix(SWR_FETCH_IDENTITIES), undefined, { revalidate: true }),
+      mutate(isStringKeyWithPrefix(SWR_FETCH_PREFERENCES), undefined, { revalidate: true }),
       mutate((key) => Array.isArray(key) && key[0] === SWR_FETCH_USER_MEMORY, undefined, {
         revalidate: true,
       }),
@@ -149,55 +148,88 @@ export class BaseActionImpl {
   };
 
   updateMemory = async (id: string, content: string, layer: LayersEnum): Promise<void> => {
-    const {
-      resetActivitiesList,
-      resetContextsList,
-      resetExperiencesList,
-      resetIdentitiesList,
-      resetPreferencesList,
-    } = this.#get();
+    let listKeyPrefix: string | undefined;
 
-    // Update the memory content based on layer
     switch (layer) {
       case LayersEnum.Activity: {
         await memoryCRUDService.updateActivity(id, { narrative: content });
-        resetActivitiesList({ q: this.#get().activitiesQuery, sort: this.#get().activitiesSort });
+        this.#set(
+          produce((draft) => {
+            const item = draft.activities.find((memory) => memory.id === id);
+            if (item) item.narrative = content;
+          }),
+          false,
+          n('updateMemory/activity'),
+        );
+        listKeyPrefix = SWR_FETCH_ACTIVITIES;
         break;
       }
       case LayersEnum.Context: {
         await memoryCRUDService.updateContext(id, { description: content });
-        resetContextsList({ q: this.#get().contextsQuery, sort: this.#get().contextsSort });
+        this.#set(
+          produce((draft) => {
+            const item = draft.contexts.find((memory) => memory.id === id);
+            if (item) item.description = content;
+          }),
+          false,
+          n('updateMemory/context'),
+        );
+        listKeyPrefix = SWR_FETCH_CONTEXTS;
         break;
       }
       case LayersEnum.Experience: {
         await memoryCRUDService.updateExperience(id, { keyLearning: content });
-        resetExperiencesList({
-          q: this.#get().experiencesQuery,
-          sort: this.#get().experiencesSort,
-        });
+        this.#set(
+          produce((draft) => {
+            const item = draft.experiences.find((memory) => memory.id === id);
+            if (item) item.keyLearning = content;
+          }),
+          false,
+          n('updateMemory/experience'),
+        );
+        listKeyPrefix = SWR_FETCH_EXPERIENCES;
         break;
       }
       case LayersEnum.Identity: {
         await memoryCRUDService.updateIdentity(id, { description: content });
-        resetIdentitiesList({ q: this.#get().identitiesQuery, types: this.#get().identitiesTypes });
+        this.#set(
+          produce((draft) => {
+            const item = draft.identities.find((memory) => memory.id === id);
+            if (item) item.description = content;
+          }),
+          false,
+          n('updateMemory/identity'),
+        );
+        listKeyPrefix = SWR_FETCH_IDENTITIES;
         break;
       }
       case LayersEnum.Preference: {
         await memoryCRUDService.updatePreference(id, { conclusionDirectives: content });
-        resetPreferencesList({
-          q: this.#get().preferencesQuery,
-          sort: this.#get().preferencesSort,
-        });
+        this.#set(
+          produce((draft) => {
+            const item = draft.preferences.find((memory) => memory.id === id);
+            if (item) item.conclusionDirectives = content;
+          }),
+          false,
+          n('updateMemory/preference'),
+        );
+        listKeyPrefix = SWR_FETCH_PREFERENCES;
         break;
       }
     }
 
-    // Clear editing state
     this.#get().clearEditingMemory();
+
+    if (listKeyPrefix) {
+      await Promise.all([
+        mutate(isStringKeyWithPrefix(listKeyPrefix)),
+        mutate(memoryDetailKey(layer, id)),
+      ]);
+    }
   };
 
   useFetchMemoryDetail = (id: string | null, layer: LayersEnum): SWRResponse<any> => {
-    const swrKey = id ? `memoryDetail-${layer}-${id}` : null;
+    const swrKey = id ? memoryDetailKey(layer, id) : null;
 
     return useSWR(
       swrKey,
