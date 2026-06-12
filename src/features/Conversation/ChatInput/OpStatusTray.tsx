@@ -14,14 +14,16 @@ import {
   type OperationType,
 } from '@/store/chat/slices/operation/types';
 import { shinyTextStyles } from '@/styles';
+import { formatElapsedClockTime } from '@/utils/formatElapsedClockTime';
 
 import { contextSelectors, dataSelectors, useConversationStore } from '../store';
 
 const styles = createStaticStyles(({ css, cssVar }) => ({
   container: css`
+    container-type: inline-size;
+
     padding-block: 8px;
     padding-inline: 14px;
-    container-type: inline-size;
     border: 1px solid ${cssVar.colorFillSecondary};
     border-block-end: none;
     border-start-start-radius: 12px;
@@ -45,6 +47,7 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
     display: inline-flex;
     gap: 4px;
     align-items: center;
+
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   `,
@@ -74,8 +77,8 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
     font-size: 12px;
   `,
   metricPopoverValue: css`
-    color: ${cssVar.colorTextSecondary};
     font-variant-numeric: tabular-nums;
+    color: ${cssVar.colorTextSecondary};
   `,
   metricValue: css`
     overflow: hidden;
@@ -83,10 +86,9 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
     text-overflow: ellipsis;
   `,
   compactMetric: css`
+    cursor: default;
     display: none;
     flex: none;
-
-    cursor: default;
 
     @container (max-width: 360px) {
       display: inline-flex;
@@ -99,7 +101,6 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
   `,
   statusText: css`
     overflow: hidden;
-
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -169,17 +170,6 @@ const ActivityGlyph = memo(() => (
 
 ActivityGlyph.displayName = 'ActivityGlyph';
 
-const formatDuration = (ms: number) => {
-  if (ms < 0) ms = 0;
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  const mm = String(minutes).padStart(2, '0');
-  const ss = String(seconds).padStart(2, '0');
-  return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
-};
-
 const formatTokens = (n: number) => {
   if (n < 1000) return String(n);
   if (n < 1_000_000) return `${(n / 1000).toFixed(1)}k`;
@@ -246,23 +236,7 @@ const OpStatusTray = memo<OpStatusTrayProps>(({ topAttached }) => {
 
   // Detect any running AI-runtime op (excludes sub-ops like callLLM/toolCalling)
   // and capture the earliest start time as the op's anchor.
-  const startTime = useChatStore((s) => {
-    const ops = operationSelectors.getOperationsByContext(context)(s);
-    let earliest: number | undefined;
-    for (const op of ops) {
-      if (
-        op.status !== 'running' ||
-        op.metadata.isAborting ||
-        !AI_RUNTIME_OPERATION_TYPES.includes(op.type)
-      ) {
-        continue;
-      }
-      if (earliest === undefined || op.metadata.startTime < earliest) {
-        earliest = op.metadata.startTime;
-      }
-    }
-    return earliest;
-  });
+  const startTime = useChatStore(operationSelectors.getAgentRuntimeStartTimeByContext(context));
 
   // The most recently started running sub-op decides the streaming phase.
   // Server-side runtimes surface no sub-ops on the client, so fall back to
@@ -407,7 +381,7 @@ const OpStatusTray = memo<OpStatusTrayProps>(({ topAttached }) => {
         <span className={cx(styles.statusText, shinyTextStyles.shinyText)}>
           {t(`opStatusTray.status.${activity}`)}...
         </span>
-        <span className={styles.timerValue}>{formatDuration(elapsed)}</span>
+        <span className={styles.timerValue}>{formatElapsedClockTime(elapsed)}</span>
       </span>
 
       {metrics.length > 0 && (
