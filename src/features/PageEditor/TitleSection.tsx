@@ -7,7 +7,6 @@ import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import EmojiPicker from '@/components/EmojiPicker';
-import { usePermission } from '@/hooks/usePermission';
 import { useDocumentStore } from '@/store/document';
 import { editorSelectors } from '@/store/document/slices/editor';
 import { useGlobalStore } from '@/store/global';
@@ -15,13 +14,15 @@ import { globalGeneralSelectors } from '@/store/global/selectors';
 import { truncateByWeightedLength } from '@/utils/textLength';
 
 import { usePageEditorStore } from './store';
+import { usePageEditable } from './usePageEditable';
 
 const TitleSection = memo(() => {
   const { t } = useTranslation('file');
-  const { allowed: canEdit } = usePermission('edit_own_content');
   const locale = useGlobalStore(globalGeneralSelectors.currentLanguage);
 
   const documentId = usePageEditorStore((s) => s.documentId);
+  // View-first: title/emoji follow the same editable gate as the body.
+  const canEdit = usePageEditable();
   const emoji = usePageEditorStore((s) => s.emoji);
   const title = usePageEditorStore((s) => s.title);
   const setEmoji = usePageEditorStore((s) => s.setEmoji);

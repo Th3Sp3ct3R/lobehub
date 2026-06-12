@@ -20,9 +20,15 @@ export interface PublicState {
 export interface State extends PublicState {
   documentId: string | undefined;
   editor?: IEditor;
+  /** True when another workspace member is actively editing this page. */
+  isLockedByOther?: boolean;
   isMetaDirty?: boolean;
+  /** True when the open page belongs to a workspace (gates view-first behaviour). */
+  isWorkspacePage?: boolean;
   lastSavedEmoji?: string;
   lastSavedTitle?: string;
+  /** User id of the member currently holding the collaborative edit lock. */
+  lockHolderId?: string | null;
   metaSaveStatus?: MetaSaveStatus;
   rightPanelMode: RightPanelMode;
 }
@@ -31,7 +37,10 @@ export const initialState: State = {
   autoSave: true,
   documentId: undefined,
   emoji: undefined,
+  isLockedByOther: false,
   isMetaDirty: false,
+  isWorkspacePage: false,
+  lockHolderId: null,
   metaSaveStatus: 'idle',
   rightPanelMode: 'copilot',
   title: undefined,

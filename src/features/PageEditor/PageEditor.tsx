@@ -19,11 +19,13 @@ import { StyleSheet } from '@/utils/styles';
 
 import EditorCanvas from './EditorCanvas';
 import Header from './Header';
+import LockBanner from './LockBanner';
 import { PageAgentProvider } from './PageAgentProvider';
 import { PageEditorProvider } from './PageEditorProvider';
 import RightPanel from './RightPanel';
 import { usePageEditorStore } from './store';
 import TitleSection from './TitleSection';
+import { usePageEditable } from './usePageEditable';
 
 /**
  * Header slot for PageEditor.
@@ -99,7 +101,7 @@ interface PageEditorCanvasProps {
 }
 
 const PageEditorCanvas = memo<PageEditorCanvasProps>(({ header, fullWidthHeader }) => {
-  const { allowed: canEdit } = usePermission('edit_own_content');
+  const editable = usePageEditable();
   const editor = usePageEditorStore((s) => s.editor);
   const documentId = usePageEditorStore((s) => s.documentId);
   const wideScreen = useGlobalStore(systemStatusSelectors.wideScreen);
@@ -122,9 +124,9 @@ const PageEditorCanvas = memo<PageEditorCanvasProps>(({ header, fullWidthHeader 
       {!fullWidthHeader && headerSlot}
       <Flexbox horizontal height={'100%'} style={styles.contentWrapper} width={'100%'}>
         <WideScreenContainer
-          wrapperStyle={{ cursor: canEdit ? 'text' : 'not-allowed' }}
+          wrapperStyle={{ cursor: editable ? 'text' : 'default' }}
           onClick={() => {
-            if (!canEdit) return;
+            if (!editable) return;
 
             editor?.focus();
           }}
@@ -132,6 +134,7 @@ const PageEditorCanvas = memo<PageEditorCanvasProps>(({ header, fullWidthHeader 
           <Flexbox className={overrideStyles.editorContent} flex={1} style={editorContentStyle}>
             <TitleSection />
             <PageMetaBar />
+            <LockBanner />
             <EditorCanvas />
           </Flexbox>
         </WideScreenContainer>
