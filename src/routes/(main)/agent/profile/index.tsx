@@ -12,11 +12,12 @@ import { useAgentStore } from '@/store/agent';
 import { agentSelectors } from '@/store/agent/selectors';
 import { StyleSheet } from '@/utils/styles';
 
+import EditLockDriver from './features/EditLockDriver';
 import Header from './features/Header';
 import ProfileEditor from './features/ProfileEditor';
 import ProfileHydration from './features/ProfileHydration';
 import ProfileProvider from './features/ProfileProvider';
-import { useProfileStore } from './features/store';
+import { selectors as profileSelectors, useProfileStore } from './features/store';
 
 const styles = StyleSheet.create({
   contentWrapper: {
@@ -64,19 +65,31 @@ const ProfileArea = memo(() => {
           </>
         )}
       </Flexbox>
+      {/* Mounted unconditionally (not behind the config-loading gate) so the lock
+          is peeked on open and resolved before the editor renders. */}
+      <EditLockDriver />
       <Suspense fallback={null}>
         <ProfileHydration />
       </Suspense>
     </>
   );
 });
+// Hide the Agent Builder while another member holds the edit lock: it drives
+// updateAgentConfig, which the server rejects under the lock — so in the
+// read-only takeover state there's nothing it can do.
+const AgentBuilderSlot = memo(() => {
+  const lockedByOther = useProfileStore(profileSelectors.lockedByOther);
+  if (lockedByOther) return null;
+  return <AgentBuilder />;
+});
+
 const AgentProfile: FC = () => {
   return (
     <Suspense fallback={<Loading debugId="AgentProfile" />}>
       <ProfileProvider>
         <Flexbox horizontal height={'100%'} width={'100%'}>
           <ProfileArea />
-          <AgentBuilder />
+          <AgentBuilderSlot />
         </Flexbox>
       </ProfileProvider>
     </Suspense>

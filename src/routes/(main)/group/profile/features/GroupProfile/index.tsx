@@ -123,7 +123,6 @@ const GroupProfile = memo(() => {
             <GroupStatusTag />
             <GroupVersionReviewTag />
             <GroupForkTag />
-            <EditingIndicator holderId={lock.lockedByOther ? lock.holderId : null} />
           </Flexbox>
         </Flexbox>
         {/* Header: Group Avatar + Title */}
@@ -174,6 +173,7 @@ const GroupProfile = memo(() => {
       </Flexbox>
       <Divider />
       {/* Group Content Editor */}
+      <EditingIndicator holderId={lock.lockedByOther ? lock.holderId : null} />
       <EditorCanvas
         disabled={!canEdit}
         editable={!lock.lockedByOther}

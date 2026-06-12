@@ -7,33 +7,23 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { createChatInputRichPlugins } from '@/features/ChatInput/InputEditor/plugins';
-import { EditingIndicator, type EditLockClient, useEditLock } from '@/features/EditLock';
+import { EditingIndicator } from '@/features/EditLock';
 import { usePermission } from '@/hooks/usePermission';
 import { EMPTY_EDITOR_STATE } from '@/libs/editor/constants';
-import { lambdaClient } from '@/libs/trpc/client';
 import { useAgentStore } from '@/store/agent';
 import { agentSelectors } from '@/store/agent/selectors';
 
 import { useMentionOptions } from '../ProfileEditor/MentionList';
 import { useProfileStore } from '../store';
+import { selectors as profileSelectors } from '../store/selectors';
 import TypoBar from './TypoBar';
 import { useSlashItems } from './useSlashItems';
-
-// Stable lock RPC binding for the agent resource.
-const agentLockClient: EditLockClient = {
-  acquire: (id) => lambdaClient.agent.acquireAgentLock.mutate({ agentId: id }),
-  peek: (id) => lambdaClient.agent.getAgentLock.query({ agentId: id }),
-  release: async (id) => {
-    await lambdaClient.agent.releaseAgentLock.mutate({ agentId: id });
-  },
-};
 
 const EditorCanvas = memo(() => {
   const { t } = useTranslation('setting');
   const { allowed: canEdit } = usePermission('edit_own_content');
   const [editorInit, setEditorInit] = useState(false);
   const [contentInit, setContentInit] = useState(false);
-  const agentId = useAgentStore((s) => s.activeAgentId);
   const config = useAgentStore(agentSelectors.currentAgentConfig, isEqual);
   const editorData = config?.editorData;
   const systemRole = config?.systemRole;
@@ -52,32 +42,24 @@ const EditorCanvas = memo(() => {
   const prevStreamingRef = useRef<string | undefined>(undefined);
   const wasStreamingRef = useRef(false);
 
-  // Collaborative edit lock for workspace agents (same model as pages): read-only
-  // when another member is editing; acquired implicitly on the first real edit.
-  // Streaming systemRole writes are programmatic, so they never latch edit-intent.
-  const [edited, setEdited] = useState(false);
-  const agentIdRef = useRef(agentId);
-  if (agentIdRef.current !== agentId) {
-    agentIdRef.current = agentId;
-    setEdited(false);
-  }
-  const lock = useEditLock({
-    client: agentLockClient,
-    // Server no-ops the lock for personal (non-workspace) agents.
-    enabled: Boolean(agentId && canEdit),
-    isDirty: edited,
-    resourceId: agentId ?? undefined,
-  });
-  const editable = canEdit && !lock.lockedByOther;
+  // Collaborative edit-lock state, peeked-on-open and driven by the always-mounted
+  // EditLockDriver (see ../EditLockDriver) so it's resolved before this editor
+  // renders — an agent another member is editing is read-only from the first frame.
+  const lockedByOther = useProfileStore(profileSelectors.lockedByOther);
+  const lockHolderId = useProfileStore(profileSelectors.lockHolderId);
+  const setHasEdited = useProfileStore((s) => s.setHasEdited);
+  const editable = canEdit && !lockedByOther;
 
   // Wrap handleContentChange with updateConfig
   const handleChange = useCallback(() => {
     if (!editable) return;
     // Don't trigger save during streaming
     if (streamingInProgress) return;
-    setEdited(true);
+    // Latch edit-intent so the lock driver acquires the lock on the first real
+    // edit. Streaming systemRole writes are programmatic and skipped above.
+    setHasEdited(true);
     handleContentChange(updateConfig);
-  }, [editable, handleContentChange, updateConfig, streamingInProgress]);
+  }, [editable, handleContentChange, updateConfig, streamingInProgress, setHasEdited]);
 
   // Handle streaming updates - update editor with streaming content
   useEffect(() => {
@@ -137,7 +119,7 @@ const EditorCanvas = memo(() => {
         e.stopPropagation();
       }}
     >
-      <EditingIndicator holderId={lock.lockedByOther ? lock.holderId : null} />
+      <EditingIndicator holderId={lockedByOther ? lockHolderId : null} />
       <Editor
         content={initialLoad}
         editable={editable}
