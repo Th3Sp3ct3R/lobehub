@@ -1,17 +1,28 @@
 import { useEditor } from '@lobehub/editor/react';
 import { ActionIcon, Flexbox } from '@lobehub/ui';
 import { Paperclip } from 'lucide-react';
-import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { EditingIndicator, type EditLockClient, useEditLock } from '@/features/EditLock';
 import { EditorCanvas } from '@/features/EditorCanvas';
 import { seedAttachments } from '@/features/EditorCanvas/attachmentRegistry';
 import { pickAndInsertAttachments } from '@/features/EditorCanvas/editorAttachments';
 import { usePermission } from '@/hooks/usePermission';
+import { lambdaClient } from '@/libs/trpc/client';
 import { useTaskStore } from '@/store/task';
 import { taskDetailSelectors } from '@/store/task/selectors';
 
 const DEBOUNCE_MS = 300;
+
+// Stable lock RPC binding for the task resource.
+const taskLockClient: EditLockClient = {
+  acquire: (id) => lambdaClient.task.acquireTaskLock.mutate({ id }),
+  peek: (id) => lambdaClient.task.getTaskLock.query({ id }),
+  release: async (id) => {
+    await lambdaClient.task.releaseTaskLock.mutate({ id });
+  },
+};
 
 const TaskInstruction = memo(() => {
   const { t } = useTranslation('chat');
@@ -22,6 +33,24 @@ const TaskInstruction = memo(() => {
   const persistedFiles = useTaskStore(taskDetailSelectors.activeTaskFiles);
   const updateTask = useTaskStore((s) => s.updateTask);
   const editor = useEditor();
+
+  // Collaborative edit lock for workspace tasks (same model as pages): read-only
+  // when another member is editing; acquired implicitly on the first edit.
+  const [edited, setEdited] = useState(false);
+  const taskIdRef = useRef(taskId);
+  if (taskIdRef.current !== taskId) {
+    taskIdRef.current = taskId;
+    setEdited(false);
+  }
+  const lock = useEditLock({
+    client: taskLockClient,
+    // Server no-ops the lock for personal (non-workspace) tasks.
+    enabled: Boolean(taskId && canEditTask),
+    isDirty: edited,
+    resourceId: taskId ?? undefined,
+  });
+  const editable = canEditTask && !lock.lockedByOther;
+
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   // Skip save when the serialized state matches the last persisted snapshot —
   // Lexical fires content-change for selection moves and other no-op events.
@@ -49,8 +78,10 @@ const TaskInstruction = memo(() => {
   }, [taskId]);
 
   const handleContentChange = useCallback(() => {
-    if (!canEditTask) return;
+    if (!editable) return;
     if (!editor || !taskId) return;
+
+    setEdited(true);
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -64,7 +95,7 @@ const TaskInstruction = memo(() => {
         console.error('[TaskInstruction] Failed to save:', e);
       });
     }, DEBOUNCE_MS);
-  }, [canEditTask, editor, taskId, updateTask]);
+  }, [editable, editor, taskId, updateTask]);
 
   const handleAttach = useCallback(() => {
     pickAndInsertAttachments(editor);
@@ -72,7 +103,10 @@ const TaskInstruction = memo(() => {
 
   return (
     <Flexbox gap={4}>
+      <EditingIndicator holderId={lock.lockedByOther ? lock.holderId : null} />
       <EditorCanvas
+        disabled={!canEditTask}
+        editable={!lock.lockedByOther}
         editor={editor}
         editorData={editorData}
         entityId={taskId}

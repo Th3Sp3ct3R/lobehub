@@ -9,7 +9,7 @@ const log = debug('lobe-server:edit-lock');
 export const EDIT_LOCK_TTL_SECONDS = 30;
 
 /** Editable resource families that can take a collaborative edit lock. */
-export type EditLockResourceType = 'document';
+export type EditLockResourceType = 'agent' | 'chatGroup' | 'document' | 'task';
 
 export interface EditLockResult {
   /** Lease expiry of the active lock, if the caller now holds it. */

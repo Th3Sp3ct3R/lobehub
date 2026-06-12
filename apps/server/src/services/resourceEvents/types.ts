@@ -1,5 +1,5 @@
 /** Editable resource families that can broadcast realtime events. */
-export type ResourceType = 'document';
+export type ResourceType = 'agent' | 'chatGroup' | 'document' | 'task';
 
 export interface ResourceRef {
   id: string;
