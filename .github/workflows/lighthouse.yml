@@ -11,9 +11,8 @@ env:
   COMMIT_MESSAGE: '🤖 chore: Lighthouse Results Refreshed'
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # every day
-  workflow_dispatch:
+  # Vanta fork: nightly cron removed — run manually only (avoids unwanted nightly runs on the fork).
+  workflow_dispatch: {}
 
 jobs:
   lighthouse-badger-advanced:
