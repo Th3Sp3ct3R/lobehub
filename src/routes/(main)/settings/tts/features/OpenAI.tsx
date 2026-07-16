@@ -9,11 +9,12 @@ import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FORM_STYLE } from '@/const/layoutTokens';
+import { SettingsSearchAnchor } from '@/features/SettingsSearch/anchor';
 import { usePermission } from '@/hooks/usePermission';
 import { useUserStore } from '@/store/user';
 import { settingsSelectors } from '@/store/user/selectors';
 
-import { opeanaiSTTOptions, opeanaiTTSOptions } from './const';
+import { opeanaiTTSOptions } from './const';
 
 const OpenAI = memo(() => {
   const { t } = useTranslation('setting');
@@ -37,21 +38,12 @@ const OpenAI = memo(() => {
             />
           </Tooltip>
         ),
-        label: t('settingTTS.openai.ttsModel'),
-        name: ['openAI', 'ttsModel'],
-      },
-      {
-        children: (
-          <Tooltip title={reason}>
-            <Select
-              disabled={!canManageServiceModel}
-              options={opeanaiSTTOptions}
-              style={{ width: 448 }}
-            />
-          </Tooltip>
+        label: (
+          <SettingsSearchAnchor id={'service-model-tts'}>
+            {t('settingTTS.openai.ttsModel')}
+          </SettingsSearchAnchor>
         ),
-        label: t('settingTTS.openai.sttModel'),
-        name: ['openAI', 'sttModel'],
+        name: ['openAI', 'ttsModel'],
       },
     ],
     extra: loading && <Icon spin icon={Loader2Icon} size={16} style={{ opacity: 0.5 }} />,

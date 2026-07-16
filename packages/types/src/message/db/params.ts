@@ -102,7 +102,7 @@ export interface UpdateMessageParams {
   provider?: string;
   reasoning?: ModelReasoning;
   role?: string;
-  search?: GroundingSearch;
+  search?: GroundingSearch | null;
   toolCalls?: MessageToolCall[];
   tools?: ChatToolPayload[] | null;
   traceId?: string;
@@ -126,8 +126,8 @@ export interface NewMessageQueryParams {
 export const UpdateMessageParamsSchema = z
   .object({
     content: z.string().optional(),
-    editorData: z.record(z.any()).nullable().optional(),
-    error: ChatMessageErrorSchema.nullable().optional(),
+    editorData: z.record(z.string(), z.any()).nullish(),
+    error: ChatMessageErrorSchema.nullish(),
     imageList: z.array(ChatImageItemSchema).optional(),
     metadata: MessageMetadataSchema.optional(),
     model: z.string().optional(),
@@ -135,9 +135,9 @@ export const UpdateMessageParamsSchema = z
     provider: z.string().optional(),
     reasoning: ModelReasoningSchema.optional(),
     role: z.string().optional(),
-    search: GroundingSearchSchema.optional(),
+    search: GroundingSearchSchema.nullish(),
     toolCalls: z.array(MessageToolCallSchema).optional(),
-    tools: z.array(ChatToolPayloadSchema).nullable().optional(),
+    tools: z.array(ChatToolPayloadSchema).nullish(),
     traceId: z.string().optional(),
     usage: ModelUsageSchema.optional(),
   })

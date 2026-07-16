@@ -1,15 +1,17 @@
 import type * as businessConstModule from '@lobechat/business-const';
 import { HeterogeneousAgentSessionErrorCode } from '@lobechat/electron-client-ipc';
 import type * as modelRuntimeModule from '@lobechat/model-runtime';
+import { AgentRuntimeErrorType } from '@lobechat/model-runtime';
 import type * as lobechatTypesModule from '@lobechat/types';
 import type * as lobehubUiModule from '@lobehub/ui';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ErrorMessageExtra from './index';
 
 const navigateMock = vi.fn();
+const updateMessageErrorMock = vi.fn();
 
 const serverConfigMock = vi.hoisted(() => ({ enableBusinessFeatures: false }));
 
@@ -18,7 +20,6 @@ vi.mock('@lobechat/business-const', async (importOriginal) => {
 
   return {
     ...actual,
-    ENABLE_BUSINESS_FEATURES: false,
   };
 });
 
@@ -66,7 +67,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('react-router-dom', () => ({
+vi.mock('react-router', () => ({
   useNavigate: () => navigateMock,
 }));
 
@@ -92,8 +93,19 @@ vi.mock('@/features/Conversation/ChatItem/components/ErrorContent', () => ({
 }));
 
 vi.mock('@/features/Electron/HeterogeneousAgent/StatusGuide', () => ({
-  default: ({ agentType, error }: { agentType?: string; error?: { code?: string } }) => (
-    <div>{`guide:${agentType}:${error?.code}`}</div>
+  default: ({
+    agentType,
+    error,
+    onDismiss,
+  }: {
+    agentType?: string;
+    error?: { code?: string };
+    onDismiss?: () => void;
+  }) => (
+    <div>
+      {`guide:${agentType}:${error?.code}`}
+      {onDismiss && <button onClick={onDismiss}>dismiss</button>}
+    </div>
   ),
 }));
 
@@ -113,16 +125,28 @@ vi.mock('@/store/serverConfig', () => ({
 }));
 
 vi.mock('@/features/Conversation/store', () => ({
+  dataSelectors: {
+    getDisplayMessageById: () => () => undefined,
+  },
   useConversationStore: (selector: (state: unknown) => unknown) =>
     selector({
+      delAndRegenerateMessage: vi.fn(),
       deleteMessage: vi.fn(),
-      regenerateAssistantMessage: vi.fn(),
+      heteroOverloadRetryAttempts: {},
+      internal_beginHeteroOverloadWait: vi.fn(),
+      internal_endHeteroOverloadWait: vi.fn(),
+      isHeteroOverloadWaitAborted: () => false,
+      markHeteroOverloadRetryExhausted: vi.fn(),
+      recordHeteroOverloadRetry: vi.fn(),
+      resetHeteroOverloadRetry: vi.fn(),
+      updateMessageError: updateMessageErrorMock,
     }),
 }));
 
 describe('ErrorMessageExtra', () => {
   beforeEach(() => {
     serverConfigMock.enableBusinessFeatures = false;
+    updateMessageErrorMock.mockClear();
   });
 
   it('keeps the localized message for known error types even when a traceId exists', () => {
@@ -214,6 +238,24 @@ describe('ErrorMessageExtra', () => {
     expect(screen.getByText('response.GoogleAIBlockReason.SAFETY')).toBeInTheDocument();
   });
 
+  it('renders the business rate-limit fallback for the canonical runtime code', () => {
+    serverConfigMock.enableBusinessFeatures = true;
+
+    render(
+      <ErrorMessageExtra
+        error={{ message: 'response.RateLimitExceeded' }}
+        data={{
+          error: {
+            type: AgentRuntimeErrorType.RateLimitExceeded,
+          } as any,
+          id: 'msg-rate-limit-runtime',
+        }}
+      />,
+    );
+
+    expect(screen.getByText('dynamic')).toBeInTheDocument();
+  });
+
   it('renders the auth guide when the refreshed error is missing type but still carries session code', () => {
     render(
       <ErrorMessageExtra
@@ -254,6 +296,27 @@ describe('ErrorMessageExtra', () => {
     );
 
     expect(screen.getByText('guide:claude-code:rate_limit')).toBeInTheDocument();
+  });
+
+  it('dismisses only the current heterogeneous error field', () => {
+    render(
+      <ErrorMessageExtra
+        error={{ message: 'response.undefined' }}
+        data={{
+          error: {
+            body: {
+              agentType: 'claude-code',
+              code: HeterogeneousAgentSessionErrorCode.RateLimit,
+            },
+          } as any,
+          id: 'failed-step-2',
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'dismiss' }));
+
+    expect(updateMessageErrorMock).toHaveBeenCalledWith('failed-step-2', null);
   });
 
   it('renders the heterogeneous guide from the session body without relying on the top-level error type', () => {

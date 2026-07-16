@@ -189,6 +189,7 @@ describe('agentGroupRouter', () => {
 
   describe('deleteGroup', () => {
     it('should delete a group by id', async () => {
+      chatGroupModelMock.findById.mockResolvedValue({ id: 'group-1', userId });
       chatGroupServiceMock.deleteGroup.mockResolvedValue({
         deletedVirtualAgentIds: [],
         group: { id: 'group-1' },
@@ -330,6 +331,7 @@ describe('agentGroupRouter', () => {
         removedFromGroup: 2,
       };
 
+      chatGroupModelMock.findById.mockResolvedValue({ id: 'group-1', userId });
       agentGroupRepoMock.removeAgentsFromGroup.mockResolvedValue(mockResult);
 
       const caller = agentGroupRouter.createCaller(mockCtx);
@@ -500,6 +502,7 @@ describe('agentGroupRouter', () => {
           expiresAt: new Date(),
           holderId: userId,
           lockedByOther: false,
+          ownerId: null,
         });
 
         const caller = agentGroupRouter.createCaller(wsCtx());
@@ -517,6 +520,7 @@ describe('agentGroupRouter', () => {
           expiresAt: new Date(),
           holderId: userId,
           lockedByOther: false,
+          ownerId: null,
         });
 
         const caller = agentGroupRouter.createCaller(wsCtx());

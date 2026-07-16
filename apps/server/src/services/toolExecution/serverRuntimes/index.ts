@@ -16,9 +16,11 @@ import { agentSignalReflectionRuntime } from './agentSignalReflection';
 import { agentSignalReviewRuntime } from './agentSignalReview';
 import { agentSignalSkillManagementRuntime } from './agentSignalSkillManagement';
 import { briefRuntime } from './brief';
+import { browserRuntime } from './browser';
 import { calculatorRuntime } from './calculator';
 import { cloudSandboxRuntime } from './cloudSandbox';
 import { credsRuntime } from './creds';
+import { groupManagementRuntime } from './groupManagement';
 import { knowledgeBaseRuntime } from './knowledgeBase';
 import { lobeAgentRuntime } from './lobeAgent';
 import { lobeDeliveryCheckerRuntime } from './lobeDeliveryChecker';
@@ -70,12 +72,14 @@ registerRuntimes([
   activatorRuntime,
   messageRuntime,
   localSystemRuntime,
+  browserRuntime,
   remoteDeviceRuntime,
   briefRuntime,
   taskRuntime,
   topicReferenceRuntime,
   userInteractionRuntime,
   credsRuntime,
+  groupManagementRuntime,
   knowledgeBaseRuntime,
   webOnboardingRuntime,
   lobeAgentRuntime,

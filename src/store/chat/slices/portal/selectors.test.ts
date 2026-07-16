@@ -84,6 +84,17 @@ describe('chatDockSelectors', () => {
     });
   });
 
+  describe('agent detail', () => {
+    it('should expose the active agent detail id', () => {
+      const state = createState({
+        portalStack: [{ agentId: 'agt_1', type: PortalViewType.AgentDetail }],
+      });
+
+      expect(chatPortalSelectors.showAgentDetail(state)).toBe(true);
+      expect(chatPortalSelectors.agentDetailId(state)).toBe('agt_1');
+    });
+  });
+
   describe('canGoBack', () => {
     it('should return false when stack has 0 or 1 views', () => {
       expect(chatPortalSelectors.canGoBack(createState())).toBe(false);
@@ -423,6 +434,30 @@ describe('chatDockSelectors', () => {
 
       expect(chatPortalSelectors.openLocalFiles(state)).toEqual([
         { filePath: '/project-b/b.ts', workingDirectory: '/project-b' },
+      ]);
+    });
+
+    it('should keep user-approved external preview files visible across topic scopes', () => {
+      const externalFile = {
+        allowExternalFilePreview: true,
+        filePath: '/tmp/worktree-switcher-demo.html',
+        workingDirectory: '/tmp',
+      };
+      const state = createState({
+        ...createTopicState('topic-b', {
+          'topic-a': '/project-a',
+          'topic-b': '/project-b',
+        }),
+        openLocalFiles: [
+          { filePath: '/project-a/a.ts', workingDirectory: '/project-a' },
+          { filePath: '/project-b/b.ts', workingDirectory: '/project-b' },
+          externalFile,
+        ],
+      } as Partial<ChatStoreState>);
+
+      expect(chatPortalSelectors.openLocalFiles(state)).toEqual([
+        { filePath: '/project-b/b.ts', workingDirectory: '/project-b' },
+        externalFile,
       ]);
     });
   });

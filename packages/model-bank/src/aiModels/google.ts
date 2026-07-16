@@ -1,4 +1,5 @@
 import {
+  nanoBanana2LiteParameters,
   nanoBanana2Parameters,
   nanoBananaParameters,
   nanoBananaProParameters,
@@ -14,6 +15,7 @@ import type { AIChatModelCard, AIImageModelCard, AIVideoModelCard } from '../typ
 const googleChatModels: AIChatModelCard[] = [
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -68,6 +70,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -97,6 +100,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -126,6 +130,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -203,6 +208,41 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      // no functionCall: the runtime always requests ['Text', 'Image'] modalities for
+      // nano-banana models, and Vertex AI rejects function declarations in that mode
+      imageOutput: true,
+      reasoning: true,
+      vision: true,
+    },
+    contextWindowTokens: 65_536 + 4_096,
+    description:
+      "Gemini 3.1 Flash Lite Image (Nano Banana 2 Lite) is Google's fastest and most cost-efficient image generation model, built for high-volume generation and editing.",
+    displayName: 'Nano Banana 2 Lite',
+    enabled: true,
+    family: 'gemini',
+    generation: 'gemini-3.1',
+    id: 'gemini-3.1-flash-lite-image',
+    knowledgeCutoff: '2025-01',
+    maxOutput: 4_096,
+    pricing: {
+      approximatePricePerImage: 0.034,
+      units: [
+        { name: 'imageOutput', rate: 30, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textInput', rate: 0.25, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'imageInput', rate: 0.25, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 1.5, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
+    releasedAt: '2026-06-30',
+    settings: {
+      // no imageResolution2: output resolution is fixed at 1K for the Lite model
+      extendParams: ['imageAspectRatio2'],
+    },
+    type: 'chat',
+  },
+  {
+    abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -294,6 +334,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -333,6 +374,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -369,6 +411,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -499,6 +542,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -588,6 +632,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -651,6 +696,7 @@ const googleChatModels: AIChatModelCard[] = [
   },
   {
     abilities: {
+      audio: true,
       functionCall: true,
       reasoning: true,
       search: true,
@@ -809,6 +855,25 @@ const googleImageModels: AIImageModelCard[] = [
       units: [
         { name: 'imageOutput', rate: 60, strategy: 'fixed', unit: 'millionTokens' },
         { name: 'textInput', rate: 0.25, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 1.5, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
+  },
+  {
+    displayName: 'Nano Banana 2 Lite',
+    id: 'gemini-3.1-flash-lite-image:image',
+    type: 'image',
+    enabled: true,
+    description:
+      "Gemini 3.1 Flash Lite Image (Nano Banana 2 Lite) is Google's fastest and most cost-efficient image generation model, built for high-volume generation and editing.",
+    releasedAt: '2026-06-30',
+    parameters: nanoBanana2LiteParameters,
+    pricing: {
+      approximatePricePerImage: 0.034,
+      units: [
+        { name: 'imageOutput', rate: 30, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textInput', rate: 0.25, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'imageInput', rate: 0.25, strategy: 'fixed', unit: 'millionTokens' },
         { name: 'textOutput', rate: 1.5, strategy: 'fixed', unit: 'millionTokens' },
       ],
     },

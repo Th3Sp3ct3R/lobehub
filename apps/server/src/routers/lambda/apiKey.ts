@@ -6,6 +6,8 @@ import { ApiKeyModel } from '@/database/models/apiKey';
 import { router } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
 
+import { assertWorkspaceRowManageable } from './_helpers/assertWorkspaceRowManageable';
+
 const apiKeyProcedure = wsCompatProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
   const wsId = ctx.workspaceId ?? undefined;
@@ -22,7 +24,7 @@ export const apiKeyRouter = router({
     .use(withScopedPermission('api_key:create'))
     .input(
       z.object({
-        expiresAt: z.date().optional().nullable(),
+        expiresAt: z.date().nullish(),
         name: z.string(),
       }),
     )
@@ -40,22 +42,32 @@ export const apiKeyRouter = router({
     .use(withScopedPermission('api_key:delete'))
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const existing = await ctx.apiKeyModel.findById(input.id);
+      if (!existing) return;
+      assertWorkspaceRowManageable(ctx, existing.userId, 'API key');
+
       return ctx.apiKeyModel.delete(input.id);
     }),
 
   getApiKey: apiKeyProcedure
+    .use(withScopedPermission('api_key:read'))
     .input(z.object({ apiKey: z.string() }))
     .query(async ({ input, ctx }) => {
       return ctx.apiKeyModel.findByKey(input.apiKey);
     }),
 
   getApiKeyById: apiKeyProcedure
+    .use(withScopedPermission('api_key:read'))
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      return ctx.apiKeyModel.findById(input.id);
+      const apiKey = await ctx.apiKeyModel.findById(input.id);
+      if (!apiKey) return apiKey;
+      assertWorkspaceRowManageable(ctx, apiKey.userId, 'API key');
+
+      return apiKey;
     }),
 
-  getApiKeys: apiKeyProcedure.query(async ({ ctx }) => {
+  getApiKeys: apiKeyProcedure.use(withScopedPermission('api_key:read')).query(async ({ ctx }) => {
     return ctx.apiKeyModel.query();
   }),
 
@@ -67,12 +79,16 @@ export const apiKeyRouter = router({
         value: z.object({
           description: z.string().optional(),
           enabled: z.boolean().optional(),
-          expiresAt: z.date().optional().nullable(),
+          expiresAt: z.date().nullish(),
           name: z.string().optional(),
         }),
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      const existing = await ctx.apiKeyModel.findById(input.id);
+      if (!existing) return;
+      assertWorkspaceRowManageable(ctx, existing.userId, 'API key');
+
       return ctx.apiKeyModel.update(input.id, input.value);
     }),
 

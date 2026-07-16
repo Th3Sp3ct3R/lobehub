@@ -1,6 +1,7 @@
 export * from './agent';
 export * from './agentExecution';
 export * from './agentGroup';
+export * from './agentHook';
 export * from './aiChat';
 export * from './aiProvider';
 export * from './artifact';
@@ -20,6 +21,7 @@ export * from './fetch';
 export * from './files';
 export * from './followUpAction';
 export * from './generation';
+export * from './heteroSessionImport';
 export * from './home';
 export * from './hotkey';
 export * from './importer';

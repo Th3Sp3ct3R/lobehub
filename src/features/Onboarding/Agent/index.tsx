@@ -2,10 +2,11 @@
 
 import { BUILTIN_AGENT_SLUGS } from '@lobechat/builtin-agents';
 import { setAgentTemplatesFetcher } from '@lobechat/builtin-tool-web-onboarding/agentMarketplace';
-import { SESSION_CHAT_TOPIC_URL } from '@lobechat/const';
+import { AGENT_CHAT_TOPIC_URL } from '@lobechat/const';
 import type { SendMessageParams } from '@lobechat/types';
 import { RequestTrigger } from '@lobechat/types';
-import { Button, ErrorBoundary, Flexbox } from '@lobehub/ui';
+import { ErrorBoundary, Flexbox } from '@lobehub/ui';
+import { Button } from '@lobehub/ui/base-ui';
 import { Drawer } from 'antd';
 import { History } from 'lucide-react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -19,6 +20,7 @@ import ModeSwitch from '@/features/Onboarding/components/ModeSwitch';
 import { useWorkspaceAwareNavigate } from '@/features/Workspace/useWorkspaceAwareNavigate';
 import { useOnboardingAgentTemplates } from '@/hooks/useOnboardingAgentTemplates';
 import { useClientDataSWR, useOnlyFetchOnceSWR } from '@/libs/swr';
+import { onboardingKeys } from '@/libs/swr/keys';
 import OnboardingContainer from '@/routes/onboarding/_layout';
 import { fetchOnboardingAgentTemplates } from '@/services/agentMarketplace';
 import {
@@ -86,7 +88,7 @@ const AgentOnboardingPage = memo(() => {
   }, []);
 
   const { data: historyData, mutate: mutateHistoryTopics } = useClientDataSWR(
-    isDev && onboardingAgentId ? ['agent-onboarding-history-topics', onboardingAgentId] : null,
+    isDev && onboardingAgentId ? onboardingKeys.agentHistoryTopics(onboardingAgentId) : null,
     () =>
       topicService.getTopics({
         agentId: onboardingAgentId,
@@ -95,7 +97,7 @@ const AgentOnboardingPage = memo(() => {
   );
 
   const { data, error, isLoading, mutate } = useOnlyFetchOnceSWR(
-    'agent-onboarding-bootstrap',
+    onboardingKeys.agentBootstrap(),
     () => userService.getOnboardingBootstrapState(),
     {
       onSuccess: async () => {
@@ -123,7 +125,7 @@ const AgentOnboardingPage = memo(() => {
   const onboardingFinished = !!agentOnboarding?.finishedAt;
   const finishTargetUrl = useMemo(() => {
     if (!onboardingFinished || !inboxAgentId || !effectiveTopicId) return undefined;
-    return SESSION_CHAT_TOPIC_URL(inboxAgentId, effectiveTopicId);
+    return AGENT_CHAT_TOPIC_URL(inboxAgentId, effectiveTopicId);
   }, [onboardingFinished, inboxAgentId, effectiveTopicId]);
 
   const viewingHistoricalTopic =
@@ -264,7 +266,7 @@ const AgentOnboardingPage = memo(() => {
         targetUrl:
           // A threaded signup target (if any) wins over the onboarding topic on finish
           peekOnboardingCallbackUrl() ??
-          (inboxAgentId && topicId ? SESSION_CHAT_TOPIC_URL(inboxAgentId, topicId) : undefined),
+          (inboxAgentId && topicId ? AGENT_CHAT_TOPIC_URL(inboxAgentId, topicId) : undefined),
       });
     },
     [inboxAgentId],

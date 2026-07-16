@@ -1,7 +1,7 @@
 'use client';
 
-import { Block, Button, Flexbox, Icon, Skeleton, Tag, Text } from '@lobehub/ui';
-import { confirmModal, Select } from '@lobehub/ui/base-ui';
+import { Block, Flexbox, Icon, Skeleton, Tag, Text } from '@lobehub/ui';
+import { Button, confirmModal, Select } from '@lobehub/ui/base-ui';
 import { App } from 'antd';
 import { createStaticStyles } from 'antd-style';
 import { ArrowLeftIcon, CheckCircle2Icon, Trash2Icon, UserIcon } from 'lucide-react';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 
 import { usePermission } from '@/hooks/usePermission';
+import { messengerKeys } from '@/libs/swr/keys';
 import { messengerService } from '@/services/messenger';
 import { serverConfigSelectors, useServerConfigStore } from '@/store/serverConfig';
 import { useUserStore } from '@/store/user';
@@ -255,7 +256,7 @@ export const UserAgentConnection = memo<UserAgentConnectionProps>(
     // filters the agent list below. The active scope is persisted server-side
     // only when an agent is chosen (it derives the workspace from the agent).
     // `PERSONAL_SCOPE` is the sentinel for personal (null).
-    const scopesSWR = useSWR(enableWorkspaceScopes ? 'messenger:bindingScopes' : null, () =>
+    const scopesSWR = useSWR(enableWorkspaceScopes ? messengerKeys.bindingScopes() : null, () =>
       messengerService.listBindingScopes(),
     );
     const [scope, setScope] = useState<string>(
@@ -383,8 +384,8 @@ export const UserAgentConnection = memo<UserAgentConnectionProps>(
 UserAgentConnection.displayName = 'MessengerUserAgentConnection';
 
 export const useMessengerData = (platform: MessengerPlatform) => {
-  const linksSWR = useSWR('messenger:listMyLinks', () => messengerService.listMyLinks());
-  const installationsSWR = useSWR('messenger:listMyInstallations', () =>
+  const linksSWR = useSWR(messengerKeys.listMyLinks(), () => messengerService.listMyLinks());
+  const installationsSWR = useSWR(messengerKeys.listMyInstallations(), () =>
     messengerService.listMyInstallations(),
   );
 
@@ -392,13 +393,22 @@ export const useMessengerData = (platform: MessengerPlatform) => {
   const installations = (installationsSWR.data ?? []).filter((i) => i.platform === platform);
   const tenantNameByTenantId = new Map(installations.map((i) => [i.tenantId, i.tenantName]));
   const isInitialLoading = linksSWR.data === undefined || installationsSWR.data === undefined;
+  // A failed links / installations fetch leaves `data === undefined`, which the
+  // callers otherwise read as a permanent skeleton — surface the error so the
+  // detail renders a failure + Retry instead (ux Read §1.1).
+  const error = linksSWR.error ?? installationsSWR.error;
 
   return {
+    error,
     installations,
     installationsMutate: installationsSWR.mutate,
     isInitialLoading,
     links,
     linksMutate: linksSWR.mutate,
+    mutate: () => {
+      void linksSWR.mutate();
+      void installationsSWR.mutate();
+    },
     tenantNameByTenantId,
   };
 };

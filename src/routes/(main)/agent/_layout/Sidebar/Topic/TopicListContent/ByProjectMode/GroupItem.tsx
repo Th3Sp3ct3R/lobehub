@@ -1,24 +1,27 @@
+import { AGENT_CHAT_URL } from '@lobechat/const';
 import { AccordionItem, ActionIcon, Center, Flexbox, Icon, Text, Tooltip } from '@lobehub/ui';
 import { createStaticStyles, cssVar, cx } from 'antd-style';
-import {
-  FolderClosedIcon,
-  FolderOpenIcon,
-  HandIcon,
-  type LucideIcon,
-  PlusIcon,
-  TriangleAlertIcon,
-} from 'lucide-react';
+import { FolderClosedIcon, FolderOpenIcon, type LucideIcon, PlusIcon } from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
 
+import { useActiveWorkspaceSlug } from '@/business/client/hooks/useActiveWorkspaceSlug';
+import { TOPIC_STATUS_VISUALS } from '@/components/ExecutionStatus';
 import RingLoadingIcon from '@/components/RingLoading';
+import UnreadDot from '@/components/UnreadDot';
 import { isDesktop } from '@/const/version';
 import { useCommitWorkingDirectory } from '@/features/ChatInput/ControlBar/useCommitWorkingDirectory';
 import { resolveExecutionTarget } from '@/helpers/executionTarget';
+import { useIsGatewayModeEnabled } from '@/helpers/gatewayMode';
+import { useQueryRoute } from '@/hooks/useQueryRoute';
+import { usePathname } from '@/libs/router/navigation';
 import { useAgentStore } from '@/store/agent';
 import { agentByIdSelectors } from '@/store/agent/selectors';
 import { useChatStore } from '@/store/chat';
+import { operationSelectors } from '@/store/chat/selectors';
 
+import { buildPrefixedAgentRoutePath, parseAgentPathname } from '../../../utils/agentPathname';
 import TopicItem from '../../List/Item';
 import { type GroupItemComponentProps } from '../GroupedAccordion';
 import {
@@ -101,13 +104,13 @@ const CollapsedStatusBadges = memo<{ counts: ProjectTopicStatusCounts }>(({ coun
     {
       className: styles.statusBadgeWaiting,
       count: counts.waitingForHuman,
-      icon: HandIcon,
+      icon: TOPIC_STATUS_VISUALS.waitingForHuman.icon,
       label: t('projectStatus.waitingForHuman', { count: counts.waitingForHuman }),
     },
     {
       className: styles.statusBadgeError,
       count: counts.failed,
-      icon: TriangleAlertIcon,
+      icon: TOPIC_STATUS_VISUALS.failed.icon,
       label: t('projectStatus.failed', { count: counts.failed }),
     },
   ].filter((item) => item.count > 0);
@@ -138,6 +141,19 @@ const CollapsedStatusBadges = memo<{ counts: ProjectTopicStatusCounts }>(({ coun
 
 CollapsedStatusBadges.displayName = 'CollapsedProjectStatusBadges';
 
+const CollapsedUnreadDot = memo<{ count: number }>(({ count }) => {
+  const { t } = useTranslation('topic');
+  const label = t('projectStatus.unread', { count });
+
+  return (
+    <Tooltip title={label}>
+      <UnreadDot label={label} />
+    </Tooltip>
+  );
+});
+
+CollapsedUnreadDot.displayName = 'CollapsedProjectUnreadDot';
+
 const GroupItem = memo<GroupItemComponentProps>(
   ({ group, activeTopicId, activeThreadId, expanded }) => {
     const { t } = useTranslation('topic');
@@ -150,26 +166,52 @@ const GroupItem = memo<GroupItemComponentProps>(
     );
 
     const agentId = useAgentStore((s) => s.activeAgentId);
-    const agencyConfig = useAgentStore(agentByIdSelectors.getAgencyConfigById(agentId ?? ''));
-    const isHeterogeneous = useAgentStore((s) =>
-      agentId ? agentByIdSelectors.isAgentHeterogeneousById(agentId)(s) : false,
+    const { aid: routeAgentId } = useParams<{ aid?: string }>();
+    const pathname = usePathname();
+    const agentRoute = useMemo(() => parseAgentPathname(pathname), [pathname]);
+    const targetAgentId = routeAgentId ?? agentRoute?.agentId ?? agentId;
+    const currentAgentId = targetAgentId ?? agentId;
+    const router = useQueryRoute();
+    const activeWorkspaceSlug = useActiveWorkspaceSlug();
+    const agencyConfig = useAgentStore(
+      agentByIdSelectors.getAgencyConfigById(currentAgentId ?? ''),
     );
-    const { commitAgentDefault } = useCommitWorkingDirectory(agentId ?? '');
+    const isHeterogeneous = useAgentStore((s) =>
+      currentAgentId ? agentByIdSelectors.isAgentHeterogeneousById(currentAgentId)(s) : false,
+    );
+    const isWorkspaceAgent = useAgentStore((s) =>
+      currentAgentId ? agentByIdSelectors.isWorkspaceAgentById(currentAgentId)(s) : false,
+    );
+    const { commitAgentDefault } = useCommitWorkingDirectory(currentAgentId ?? '');
 
     const handleAddTopic = useCallback(async () => {
-      if (!workingDirectory || !agentId) return;
+      if (!workingDirectory || !currentAgentId || !targetAgentId) return;
       // Write the agent's per-device default so the new topic inherits this
       // directory at creation time — the same high-precedence slot the picker
       // uses, not the legacy per-agent fallback that gets shadowed by it.
       await commitAgentDefault(workingDirectory);
       useChatStore.getState().switchTopic(null, { skipRefreshMessage: true });
-    }, [workingDirectory, agentId, commitAgentDefault]);
+      router.push(
+        buildPrefixedAgentRoutePath(AGENT_CHAT_URL(targetAgentId), agentRoute, activeWorkspaceSlug),
+      );
+    }, [
+      workingDirectory,
+      currentAgentId,
+      targetAgentId,
+      commitAgentDefault,
+      router,
+      agentRoute,
+      activeWorkspaceSlug,
+    ]);
 
     // Web can add a topic in a directory too when the agent targets a bound
     // device — the write goes to `workingDirByDevice`, no Electron dependency.
+    const deviceRoutingAvailable = useIsGatewayModeEnabled(currentAgentId);
     const effectiveTarget = resolveExecutionTarget(agencyConfig, {
-      isDesktop,
+      clientExecutionAvailable: isDesktop,
+      deviceRoutingAvailable,
       isHetero: isHeterogeneous,
+      workspaceScoped: isWorkspaceAgent,
     });
     const isDeviceMode = effectiveTarget === 'device' && !!agencyConfig?.boundDeviceId;
     const canAddTopic = (isDesktop || isDeviceMode) && !!workingDirectory;
@@ -179,14 +221,21 @@ const GroupItem = memo<GroupItemComponentProps>(
       () => getProjectTopicStatusCounts(children, new Set(loadingTopicIds)),
       [children, loadingTopicIds],
     );
+    const childTopicIds = useMemo(() => children.map((topic) => topic.id), [children]);
+    const unreadCount = useChatStore(
+      operationSelectors.unreadCompletedCountForTopics(childTopicIds),
+    );
     const hasCollapsedStatus = !expanded && hasProjectTopicStatusCounts(statusCounts);
+    const hasCollapsedUnread = !expanded && unreadCount > 0;
+    const hasCollapsedIndicators = hasCollapsedStatus || hasCollapsedUnread;
     const ProjectFolderIcon = expanded ? FolderOpenIcon : FolderClosedIcon;
     const action =
-      canAddTopic || hasCollapsedStatus ? (
+      canAddTopic || hasCollapsedIndicators ? (
         <Flexbox horizontal align={'center'} gap={4}>
           {hasCollapsedStatus && <CollapsedStatusBadges counts={statusCounts} />}
+          {hasCollapsedUnread && <CollapsedUnreadDot count={unreadCount} />}
           {canAddTopic && (
-            <span className={hasCollapsedStatus ? styles.addTopicAction : undefined}>
+            <span className={hasCollapsedIndicators ? styles.addTopicAction : undefined}>
               <ActionIcon
                 icon={PlusIcon}
                 size={'small'}
@@ -205,7 +254,7 @@ const GroupItem = memo<GroupItemComponentProps>(
     return (
       <AccordionItem
         action={action}
-        alwaysShowAction={hasCollapsedStatus}
+        alwaysShowAction={hasCollapsedIndicators}
         itemKey={id}
         paddingBlock={4}
         paddingInline={4}

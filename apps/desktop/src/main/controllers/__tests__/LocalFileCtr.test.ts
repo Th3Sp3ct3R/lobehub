@@ -108,7 +108,7 @@ const mockApp = {
     return mockSearchService;
   }),
   localFileProtocolManager: mockLocalFileProtocolManager,
-  toolDetectorManager: {
+  binaryManager: {
     getBestTool: vi.fn(() => null), // No external tools available, use Node.js fallback
   },
 } as unknown as App;
@@ -226,6 +226,7 @@ describe('LocalFileCtr', () => {
 
       expect(mockLocalFileProtocolManager.createPreviewUrl).toHaveBeenCalledWith({
         accept: undefined,
+        allowExternalFile: undefined,
         filePath: '/workspace/app.ts',
         workspaceRoot: '/workspace',
       });
@@ -262,12 +263,36 @@ describe('LocalFileCtr', () => {
 
       expect(mockLocalFileProtocolManager.createPreviewUrl).toHaveBeenCalledWith({
         accept: 'image',
+        allowExternalFile: undefined,
         filePath: '/workspace/image.png',
         workspaceRoot: '/workspace',
       });
       expect(result).toEqual({
         success: true,
         url: 'localfile://file/workspace/image.png?token=abc',
+      });
+    });
+
+    it('should forward user-approved external preview URL access', async () => {
+      mockLocalFileProtocolManager.createPreviewUrl.mockResolvedValue(
+        'localfile://file/tmp/worktree-switcher-demo.html?token=abc',
+      );
+
+      const result = await localFileCtr.getLocalFilePreviewUrl({
+        allowExternalFile: true,
+        path: '/tmp/worktree-switcher-demo.html',
+        workingDirectory: '/tmp',
+      });
+
+      expect(mockLocalFileProtocolManager.createPreviewUrl).toHaveBeenCalledWith({
+        allowExternalFile: true,
+        accept: undefined,
+        filePath: '/tmp/worktree-switcher-demo.html',
+        workspaceRoot: '/tmp',
+      });
+      expect(result).toEqual({
+        success: true,
+        url: 'localfile://file/tmp/worktree-switcher-demo.html?token=abc',
       });
     });
   });
@@ -287,6 +312,7 @@ describe('LocalFileCtr', () => {
 
       expect(mockLocalFileProtocolManager.readPreviewFile).toHaveBeenCalledWith({
         accept: undefined,
+        allowExternalFile: undefined,
         filePath: '/workspace/app.ts',
         workspaceRoot: '/workspace',
       });
@@ -329,6 +355,7 @@ describe('LocalFileCtr', () => {
 
       expect(mockLocalFileProtocolManager.readPreviewFile).toHaveBeenCalledWith({
         accept: 'image',
+        allowExternalFile: undefined,
         filePath: '/workspace/image.png',
         workspaceRoot: '/workspace',
       });
@@ -337,6 +364,35 @@ describe('LocalFileCtr', () => {
           base64: Buffer.from('image-bytes').toString('base64'),
           contentType: 'image/png',
           type: 'image',
+        },
+        success: true,
+      });
+    });
+
+    it('should forward user-approved external preview reads', async () => {
+      mockLocalFileProtocolManager.readPreviewFile.mockResolvedValue({
+        buffer: Buffer.from('<h1>Demo</h1>'),
+        contentType: 'text/html',
+        realPath: '/tmp/worktree-switcher-demo.html',
+      });
+
+      const result = await localFileCtr.getLocalFilePreview({
+        allowExternalFile: true,
+        path: '/tmp/worktree-switcher-demo.html',
+        workingDirectory: '/tmp',
+      });
+
+      expect(mockLocalFileProtocolManager.readPreviewFile).toHaveBeenCalledWith({
+        allowExternalFile: true,
+        accept: undefined,
+        filePath: '/tmp/worktree-switcher-demo.html',
+        workspaceRoot: '/tmp',
+      });
+      expect(result).toEqual({
+        preview: {
+          content: '<h1>Demo</h1>',
+          contentType: 'text/html',
+          type: 'text',
         },
         success: true,
       });
@@ -464,13 +520,19 @@ describe('LocalFileCtr', () => {
         '/mock/app/storage/file-storage/skills/archives/zip-hash-123.zip',
         expect.any(Buffer),
       );
+      // Extraction goes into a staging dir that is swapped in via rename so
+      // the live cache path never exposes a partially written tree.
       expect(mockFsPromises.writeFile).toHaveBeenCalledWith(
-        '/mock/app/storage/file-storage/skills/extracted/zip-hash-123/SKILL.md',
+        '/mock/app/storage/file-storage/skills/extracted/.staging-zip-hash-123/SKILL.md',
         expect.any(Buffer),
       );
       expect(mockFsPromises.writeFile).toHaveBeenCalledWith(
-        '/mock/app/storage/file-storage/skills/extracted/zip-hash-123/docs/reference.txt',
+        '/mock/app/storage/file-storage/skills/extracted/.staging-zip-hash-123/docs/reference.txt',
         expect.any(Buffer),
+      );
+      expect(mockFsPromises.rename).toHaveBeenCalledWith(
+        '/mock/app/storage/file-storage/skills/extracted/.staging-zip-hash-123',
+        '/mock/app/storage/file-storage/skills/extracted/zip-hash-123',
       );
     });
 
@@ -673,7 +735,7 @@ describe('LocalFileCtr', () => {
           }),
         ]),
       );
-      expect(result.totalCount).toBe(result.entries.length);
+      expect(result).not.toHaveProperty('totalCount');
     });
 
     it('should fall back to glob when git indexing fails', async () => {
@@ -690,6 +752,11 @@ describe('LocalFileCtr', () => {
 
       const result = await localFileCtr.getProjectFileIndex({ scope: '/workspace/project' });
 
+      expect(mockSearchService.glob).toHaveBeenCalledWith({
+        limit: 5000,
+        pattern: '**/*',
+        scope: '/workspace/project',
+      });
       expect(result.source).toBe('glob');
       expect(result.entries).toEqual([
         expect.objectContaining({
@@ -703,6 +770,7 @@ describe('LocalFileCtr', () => {
           relativePath: 'src/index.ts',
         }),
       ]);
+      expect(result).not.toHaveProperty('totalCount');
     });
 
     it('should mark glob entries as files when stat fails', async () => {

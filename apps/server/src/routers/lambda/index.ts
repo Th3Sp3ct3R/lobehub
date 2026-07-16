@@ -18,6 +18,7 @@ import { workspaceMemberRouter } from '@/business/server/lambda-routers/workspac
 import { workspaceUsageRouter } from '@/business/server/lambda-routers/workspaceUsage';
 import { publicProcedure, router } from '@/libs/trpc/lambda';
 
+import { acceptanceRouter } from './acceptance';
 import { agentRouter } from './agent';
 import { agentBotProviderRouter } from './agentBotProvider';
 import { agentDocumentRouter } from './agentDocument';
@@ -32,11 +33,13 @@ import { aiChatRouter } from './aiChat';
 import { aiModelRouter } from './aiModel';
 import { aiProviderRouter } from './aiProvider';
 import { apiKeyRouter } from './apiKey';
+import { asrRouter } from './asr';
 import { botMessageRouter } from './botMessage';
 import { briefRouter } from './brief';
 import { changelogRouter } from './changelog';
 import { chunkRouter } from './chunk';
 import { comfyuiRouter } from './comfyui';
+import { composioRouter } from './composio';
 import { configRouter } from './config';
 import { connectorRouter } from './connector';
 import { deviceRouter } from './device';
@@ -59,6 +62,7 @@ import { messageRouter } from './message';
 import { messengerRouter } from './messenger';
 import { notebookRouter } from './notebook';
 import { notificationRouter } from './notification';
+import { oauthAppRouter } from './oauthApp';
 import { oauthDeviceFlowRouter } from './oauthDeviceFlow';
 import { pluginRouter } from './plugin';
 import { pushTokenRouter } from './pushToken';
@@ -79,8 +83,10 @@ import { userMemoryRouter } from './userMemory';
 import { verifyRouter } from './verify';
 import { videoRouter } from './video';
 import { webBrowsingRouter } from './webBrowsing';
+import { workspaceUserSettingsRouter } from './workspaceUserSettings';
 
 export const lambdaRouter = router({
+  acceptance: acceptanceRouter,
   agent: agentRouter,
   agentBotProvider: agentBotProviderRouter,
   agentNotify: agentNotifyRouter,
@@ -98,6 +104,7 @@ export const lambdaRouter = router({
   aiModel: aiModelRouter,
   aiProvider: aiProviderRouter,
   apiKey: apiKeyRouter,
+  asr: asrRouter,
   chunk: chunkRouter,
   comfyui: comfyuiRouter,
   config: configRouter,
@@ -115,6 +122,8 @@ export const lambdaRouter = router({
   home: homeRouter,
   image: imageRouter,
   importer: importerRouter,
+  composio: composioRouter,
+
   klavis: klavisRouter,
   knowledge: knowledgeRouter,
   knowledgeBase: knowledgeBaseRouter,
@@ -124,6 +133,7 @@ export const lambdaRouter = router({
   messenger: messengerRouter,
   notebook: notebookRouter,
   notification: notificationRouter,
+  oauthApp: oauthAppRouter,
   oauthDeviceFlow: oauthDeviceFlowRouter,
   plugin: pluginRouter,
   pushToken: pushTokenRouter,
@@ -150,6 +160,7 @@ export const lambdaRouter = router({
   workspaceData: workspaceDataRouter,
   workspaceMember: workspaceMemberRouter,
   workspaceUsage: workspaceUsageRouter,
+  workspaceUserSettings: workspaceUserSettingsRouter,
   accountDeletion: accountDeletionRouter,
   pageShare: pageShareRouter,
   referral: referralRouter,

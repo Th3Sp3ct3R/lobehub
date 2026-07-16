@@ -5,7 +5,7 @@ import isEqual from 'fast-deep-equal';
 import { MoreHorizontal } from 'lucide-react';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import urlJoin from 'url-join';
 
 import NavItem from '@/features/NavPanel/components/NavItem';
@@ -24,6 +24,7 @@ const FlatMode = memo(() => {
   const navigate = useNavigate();
   const topicPageSize = useGlobalStore(systemStatusSelectors.topicPageSize);
   const topicSortBy = useUserStore(preferenceSelectors.topicSortBy);
+  const topicIncludeCompleted = useUserStore(preferenceSelectors.topicIncludeCompleted);
 
   const [activeTopicId, activeThreadId, hasMore, isExpandingPageSize, activeAgentId] = useChatStore(
     (s) => [
@@ -36,7 +37,7 @@ const FlatMode = memo(() => {
   );
 
   const activeTopicList = useChatStore(
-    topicSelectors.displayTopicsForSidebar(topicPageSize, topicSortBy),
+    topicSelectors.displayTopicsForSidebar(topicPageSize, topicSortBy, topicIncludeCompleted),
     isEqual,
   );
 

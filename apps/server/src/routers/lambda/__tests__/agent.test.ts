@@ -4,13 +4,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { INBOX_SESSION_ID } from '@/const/session';
 import { DEFAULT_AGENT_CONFIG } from '@/const/settings';
 import { AgentModel } from '@/database/models/agent';
+import { ChatGroupModel } from '@/database/models/chatGroup';
 import { FileModel } from '@/database/models/file';
 import { KnowledgeBaseModel } from '@/database/models/knowledgeBase';
 import { SessionModel } from '@/database/models/session';
+import { TaskModel } from '@/database/models/task';
 import { UserModel } from '@/database/models/user';
 import { AgentService } from '@/server/services/agent';
 import { EditLockService } from '@/server/services/editLock';
 import { publishResourceEvent } from '@/server/services/resourceEvents';
+import { hasWorkspaceScopedPermission } from '@/server/services/workspacePermission';
 import { KnowledgeType } from '@/types/knowledgeBase';
 
 import { agentRouter } from '../agent';
@@ -33,6 +36,14 @@ vi.mock('@/database/models/session', () => ({
   SessionModel: vi.fn(),
 }));
 
+vi.mock('@/database/models/task', () => ({
+  TaskModel: vi.fn(),
+}));
+
+vi.mock('@/database/models/chatGroup', () => ({
+  ChatGroupModel: vi.fn(),
+}));
+
 vi.mock('@/database/models/file', () => ({
   FileModel: vi.fn(),
 }));
@@ -45,10 +56,16 @@ vi.mock('@/server/services/agent', () => ({
   AgentService: vi.fn(),
 }));
 
+vi.mock('@/server/services/workspacePermission', () => ({
+  hasWorkspaceScopedPermission: vi.fn(),
+}));
+
 describe('agentRouter', () => {
   const userId = 'testUserId';
   let mockCtx: any;
   let agentModelMock: any;
+  let taskModelMock: any;
+  let chatGroupModelMock: any;
   let sessionModelMock: any;
   let fileModelMock: any;
   let knowledgeBaseModelMock: any;
@@ -64,11 +81,22 @@ describe('agentRouter', () => {
       deleteAgentKnowledgeBase: vi.fn(),
       findBySessionId: vi.fn(),
       getAgentAssignedKnowledge: vi.fn(),
+      getAgentVisibility: vi.fn().mockResolvedValue(null),
       toggleFile: vi.fn(),
       toggleKnowledgeBase: vi.fn(),
       update: vi.fn(),
     };
     vi.mocked(AgentModel).mockImplementation(() => agentModelMock);
+
+    taskModelMock = {
+      countTasksBlockingAgentDemotion: vi.fn().mockResolvedValue(0),
+    };
+    vi.mocked(TaskModel).mockImplementation(() => taskModelMock);
+
+    chatGroupModelMock = {
+      countGroupsBlockingAgentDemotion: vi.fn().mockResolvedValue(0),
+    };
+    vi.mocked(ChatGroupModel).mockImplementation(() => chatGroupModelMock);
 
     sessionModelMock = {
       findByIdOrSlug: vi.fn(),
@@ -171,14 +199,18 @@ describe('agentRouter', () => {
           fileType: 'text',
           id: 'file1',
           name: 'File 1',
+          ownerUserId: undefined,
           type: KnowledgeType.File,
+          visibility: undefined,
         },
         {
           enabled: false,
           fileType: 'pdf',
           id: 'file2',
           name: 'File 2',
+          ownerUserId: undefined,
           type: KnowledgeType.File,
+          visibility: undefined,
         },
         {
           avatar: 'avatar1',
@@ -186,7 +218,9 @@ describe('agentRouter', () => {
           enabled: true,
           id: 'kb1',
           name: 'KB 1',
+          ownerUserId: undefined,
           type: KnowledgeType.KnowledgeBase,
+          visibility: undefined,
         },
         {
           avatar: 'avatar2',
@@ -194,7 +228,9 @@ describe('agentRouter', () => {
           enabled: false,
           id: 'kb2',
           name: 'KB 2',
+          ownerUserId: undefined,
           type: KnowledgeType.KnowledgeBase,
+          visibility: undefined,
         },
       ]);
     });
@@ -336,6 +372,120 @@ describe('agentRouter', () => {
     });
   });
 
+  describe('setAgentVisibility', () => {
+    const wsCtx = () => ({ ...mockCtx, workspaceId: 'ws-1' });
+
+    beforeEach(() => {
+      agentModelMock.getAgentVisibilityMeta = vi.fn().mockResolvedValue({
+        slug: null,
+        userId,
+        visibility: 'public',
+      });
+      agentModelMock.setVisibility = vi.fn().mockResolvedValue({ id: 'agent-1' });
+    });
+
+    it('rejects demotion while workspace tasks still depend on the agent', async () => {
+      taskModelMock.countTasksBlockingAgentDemotion.mockResolvedValue(2);
+
+      const caller = agentRouter.createCaller(wsCtx());
+
+      await expect(
+        caller.setAgentVisibility({ id: 'agent-1', visibility: 'private' }),
+      ).rejects.toMatchObject({ code: 'BAD_REQUEST' });
+      // Compared against the agent owner (meta.userId), not just the caller.
+      expect(taskModelMock.countTasksBlockingAgentDemotion).toHaveBeenCalledWith('agent-1', userId);
+      expect(agentModelMock.setVisibility).not.toHaveBeenCalled();
+    });
+
+    it('allows demotion when no task depends on the agent', async () => {
+      taskModelMock.countTasksBlockingAgentDemotion.mockResolvedValue(0);
+
+      const caller = agentRouter.createCaller(wsCtx());
+      const result = await caller.setAgentVisibility({ id: 'agent-1', visibility: 'private' });
+
+      expect(result).toEqual({ success: true });
+      expect(agentModelMock.setVisibility).toHaveBeenCalledWith('agent-1', 'private');
+    });
+
+    it('rejects demotion while the agent supervises group chats visible to others (LOBE-11772)', async () => {
+      chatGroupModelMock.countGroupsBlockingAgentDemotion.mockResolvedValue(1);
+
+      const caller = agentRouter.createCaller(wsCtx());
+
+      await expect(
+        caller.setAgentVisibility({ id: 'agent-1', visibility: 'private' }),
+      ).rejects.toMatchObject({ code: 'BAD_REQUEST' });
+      // Compared against the agent owner (meta.userId), not just the caller.
+      expect(chatGroupModelMock.countGroupsBlockingAgentDemotion).toHaveBeenCalledWith(
+        'agent-1',
+        userId,
+      );
+      expect(agentModelMock.setVisibility).not.toHaveBeenCalled();
+    });
+
+    it('rejects demotion of another member agent even for a workspace owner (LOBE-11760)', async () => {
+      agentModelMock.getAgentVisibilityMeta.mockResolvedValue({
+        slug: null,
+        userId: 'other-member',
+        visibility: 'public',
+      });
+
+      const caller = agentRouter.createCaller(wsCtx());
+
+      await expect(
+        caller.setAgentVisibility({ id: 'agent-1', visibility: 'private' }),
+      ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+      // Creator-only: rejected before the owner-permission lookup even runs.
+      expect(hasWorkspaceScopedPermission).not.toHaveBeenCalled();
+      expect(agentModelMock.setVisibility).not.toHaveBeenCalled();
+    });
+
+    it('still allows a workspace owner to promote another member agent', async () => {
+      agentModelMock.getAgentVisibilityMeta.mockResolvedValue({
+        slug: null,
+        userId: 'other-member',
+        visibility: 'private',
+      });
+      vi.mocked(hasWorkspaceScopedPermission).mockResolvedValue(true);
+
+      const caller = agentRouter.createCaller(wsCtx());
+      const result = await caller.setAgentVisibility({ id: 'agent-1', visibility: 'public' });
+
+      expect(result).toEqual({ success: true });
+      expect(agentModelMock.setVisibility).toHaveBeenCalledWith('agent-1', 'public');
+    });
+
+    it('rejects promotion of another member agent for a plain member', async () => {
+      agentModelMock.getAgentVisibilityMeta.mockResolvedValue({
+        slug: null,
+        userId: 'other-member',
+        visibility: 'private',
+      });
+      vi.mocked(hasWorkspaceScopedPermission).mockResolvedValue(false);
+
+      const caller = agentRouter.createCaller(wsCtx());
+
+      await expect(
+        caller.setAgentVisibility({ id: 'agent-1', visibility: 'public' }),
+      ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+      expect(agentModelMock.setVisibility).not.toHaveBeenCalled();
+    });
+
+    it('does not run the public-task guard on promotion', async () => {
+      agentModelMock.getAgentVisibilityMeta.mockResolvedValue({
+        slug: null,
+        userId,
+        visibility: 'private',
+      });
+
+      const caller = agentRouter.createCaller(wsCtx());
+      await caller.setAgentVisibility({ id: 'agent-1', visibility: 'public' });
+
+      expect(taskModelMock.countTasksBlockingAgentDemotion).not.toHaveBeenCalled();
+      expect(agentModelMock.setVisibility).toHaveBeenCalledWith('agent-1', 'public');
+    });
+  });
+
   describe('edit lock', () => {
     const wsCtx = () => ({ ...mockCtx, workspaceId: 'ws-1' });
 
@@ -393,6 +543,7 @@ describe('agentRouter', () => {
           expiresAt: new Date(),
           holderId: userId,
           lockedByOther: false,
+          ownerId: null,
         });
 
         const caller = agentRouter.createCaller(wsCtx());
@@ -410,6 +561,7 @@ describe('agentRouter', () => {
           expiresAt: new Date(),
           holderId: userId,
           lockedByOther: false,
+          ownerId: null,
         });
 
         const caller = agentRouter.createCaller(wsCtx());

@@ -3,6 +3,12 @@ import type { ReactNode } from 'react';
 
 export type MessengerPlatform = 'telegram' | 'slack' | 'discord';
 
+export const SUPPORTED_MESSENGER_PLATFORMS = [
+  { id: 'telegram', name: 'Telegram' },
+  { id: 'slack', name: 'Slack' },
+  { id: 'discord', name: 'Discord' },
+] as const satisfies readonly { id: MessengerPlatform; name: string }[];
+
 export const PLATFORM_TAB_ICONS: Record<MessengerPlatform, ReactNode> = {
   discord: <Discord.Color size={16} />,
   slack: <Slack.Color size={16} />,
@@ -63,7 +69,7 @@ export const buildSlackOpenBotUrl = (tenantId: string, appId?: string): string =
  * `/api/agent/messenger/discord/install` (OAuth code-grant) rather than a
  * hardcoded `discord.com/oauth2/authorize` URL, so the callback can persist
  * the guild as an audit row. Bot scopes / permissions live in
- * `src/server/services/messenger/platforms/discord/oauth.ts`.
+ * `apps/server/src/services/messenger/platforms/discord/oauth.ts`.
  */
 export const buildDiscordOpenBotUrl = (applicationId: string): string =>
   `https://discord.com/users/${applicationId}`;

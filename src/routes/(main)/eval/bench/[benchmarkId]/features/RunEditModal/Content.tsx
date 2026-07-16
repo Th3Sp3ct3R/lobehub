@@ -3,13 +3,13 @@
 import { AGENT_PROFILE_URL, DEFAULT_INBOX_AVATAR, INBOX_SESSION_ID } from '@lobechat/const';
 import type { AgentEvalRunStatus, EvalRunInputConfig } from '@lobechat/types';
 import { Accordion, AccordionItem, ActionIcon, Avatar, Flexbox } from '@lobehub/ui';
-import { useModalContext } from '@lobehub/ui/base-ui';
-import { App, Form, Input, InputNumber, Select, Space } from 'antd';
-import { createStaticStyles } from 'antd-style';
+import { Select, useModalContext } from '@lobehub/ui/base-ui';
+import { App, Form, Input, InputNumber, Space } from 'antd';
+import { createStaticStyles, cssVar } from 'antd-style';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { useWorkspaceAwareNavigate } from '@/features/Workspace/useWorkspaceAwareNavigate';
 import { agentService } from '@/services/agent';
@@ -17,7 +17,7 @@ import { useEvalStore } from '@/store/eval';
 
 const MAX_TIMEOUT_MINUTES = 240;
 
-const styles = createStaticStyles(({ css, cssVar }) => ({
+const styles = createStaticStyles(({ css }) => ({
   agentSelect: css`
     .ant-select-content-value {
       height: 22px !important;
@@ -26,7 +26,7 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
   hint: css`
     display: inline-block;
     margin-block-start: 4px;
-    font-size: 12px;
+    font-size: ${cssVar.fontSizeSM};
     color: ${cssVar.colorTextQuaternary};
   `,
 }));
@@ -121,7 +121,7 @@ const RunEditContent: FC<RunEditContentProps> = ({ formId, onLoadingChange, run 
             <span>{agent.title}</span>
           </span>
         ),
-        searchLabel: agent.title || '',
+        title: agent.title || '',
         value: agent.id,
       })),
     [allAgents],
@@ -164,7 +164,7 @@ const RunEditContent: FC<RunEditContentProps> = ({ formId, onLoadingChange, run 
         <Space>
           <span>{currentDataset?.name || run.datasetId}</span>
           {currentDataset?.testCaseCount !== undefined && (
-            <span style={{ color: 'var(--ant-color-text-quaternary)', fontSize: 12 }}>
+            <span style={{ color: cssVar.colorTextQuaternary, fontSize: 12 }}>
               {t('run.create.caseCount', { count: currentDataset.testCaseCount })}
             </span>
           )}
@@ -197,9 +197,6 @@ const RunEditContent: FC<RunEditContentProps> = ({ formId, onLoadingChange, run 
             options={agentOptions}
             placeholder={t('run.create.agent.placeholder')}
             variant="filled"
-            filterOption={(input, option) =>
-              (option?.searchLabel as string)?.toLowerCase().includes(input.toLowerCase())
-            }
             optionRender={(option) => (
               <span
                 style={{
@@ -224,7 +221,7 @@ const RunEditContent: FC<RunEditContentProps> = ({ formId, onLoadingChange, run 
       <Accordion defaultExpandedKeys={[]}>
         <AccordionItem
           itemKey="advanced"
-          paddingBlock={6}
+          paddingBlock={8}
           paddingInline={4}
           title={t('run.create.advanced')}
         >

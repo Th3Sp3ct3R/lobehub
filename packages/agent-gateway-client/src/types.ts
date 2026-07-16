@@ -6,6 +6,12 @@ export type AgentStreamEventType =
   | 'stream_start'
   | 'stream_chunk'
   | 'stream_end'
+  /**
+   * Producer-side boundary meaning this operation will not emit more visible
+   * assistant/tool/intervention output. The operation may still wait for
+   * `agent_runtime_end` to finish terminal bookkeeping.
+   */
+  | 'visible_output_end'
   | 'stream_retry'
   | 'tool_start'
   | 'tool_end'
@@ -77,8 +83,31 @@ export interface StreamChunkData {
 
 // ─── Typed Event Data ───
 
+/**
+ * The assistant message row the server created for this step.
+ *
+ * `id` is always present. Newer servers also ship the seed fields the client
+ * needs to insert the message into its local store: the `step_start`
+ * uiMessages snapshot is resolved BEFORE this row is created, so the snapshot
+ * never contains it — without a local insert, every stream_chunk/stream_end
+ * dispatch for the step targets a missing id and is silently dropped
+ * (LOBE-11501). Older servers send only `{ id }`; clients fall back to a DB
+ * refetch in that case.
+ */
+export interface StreamStartAssistantMessage {
+  agentId?: string | null;
+  groupId?: string | null;
+  id: string;
+  model?: string | null;
+  parentId?: string | null;
+  provider?: string | null;
+  role?: string;
+  threadId?: string | null;
+  topicId?: string | null;
+}
+
 export interface StreamStartData {
-  assistantMessage: { id: string };
+  assistantMessage: StreamStartAssistantMessage;
   model?: string;
   provider?: string;
 }
@@ -100,6 +129,31 @@ export interface StepCompleteData {
   phase: string;
   reason?: string;
   reasonDetail?: string;
+}
+
+/**
+ * `step_complete` carrying `phase: 'subagent_progress'` — a `callSubAgent`
+ * child's running totals, emitted once per child step.
+ *
+ * Published onto the PARENT operation's channel, because the client opens one
+ * WebSocket per operation and never subscribes to the child's. Rides
+ * `step_complete` rather than a new `AgentStreamEventType` so the out-of-repo
+ * gateway worker needs no change, and so older clients (which only act on
+ * `phase: 'execution_complete'`) ignore it.
+ *
+ * Advisory only — the authoritative stats are backfilled onto the tool
+ * message's `pluginState` by `completeSubAgentBridge` when the child finishes.
+ */
+export interface SubAgentProgressData extends StepCompleteData {
+  model?: string;
+  phase: 'subagent_progress';
+  /** The parked parent's placeholder tool message these stats belong to. */
+  toolMessageId: string;
+  totalCost?: number;
+  totalInputTokens?: number;
+  totalOutputTokens?: number;
+  totalTokens?: number;
+  totalToolCalls?: number;
 }
 
 /**
@@ -162,6 +216,12 @@ export interface AuthMessage {
 export interface ResumeMessage {
   lastEventId: string;
   type: 'resume';
+  /**
+   * Opt into the authoritative `resume_complete` reply. Set by
+   * this client so a current gateway hands back the stored session status;
+   * legacy gateways ignore it and replay only.
+   */
+  wantStatus?: boolean;
 }
 
 export interface HeartbeatMessage {
@@ -188,11 +248,7 @@ export interface ToolResultMessage {
 }
 
 export type ClientMessage =
-  | AuthMessage
-  | HeartbeatMessage
-  | InterruptMessage
-  | ResumeMessage
-  | ToolResultMessage;
+  AuthMessage | HeartbeatMessage | InterruptMessage | ResumeMessage | ToolResultMessage;
 
 // Server → Client
 export interface AuthSuccessMessage {
@@ -229,22 +285,38 @@ export interface SessionCompleteMessage {
   type: 'session_complete';
 }
 
+/**
+ * Authoritative session status. Mirrors the gateway DO's `SessionStatus`.
+ */
+export type SessionStatus =
+  'running' | 'waiting_input' | 'waiting_confirmation' | 'completed' | 'error' | 'interrupted';
+
+/**
+ * Server → Client: sent right after a `resume` replay, carrying the DO's
+ * authoritative `status` from storage. Because the DO's in-memory event buffer
+ * is wiped by hibernation, an empty replay is ambiguous — the run may still be
+ * alive. This message resolves that ambiguity so the client never guesses
+ * "completed" from silence (which would clear the shared `runningOperation` and
+ * cancel the run on every device).
+ */
+export interface ResumeCompleteMessage {
+  status: SessionStatus;
+  type: 'resume_complete';
+}
+
 export type ServerMessage =
   | AgentEventMessage
   | AuthExpiredMessage
   | AuthFailedMessage
   | AuthSuccessMessage
   | HeartbeatAckMessage
+  | ResumeCompleteMessage
   | SessionCompleteMessage;
 
 // ─── Connection Status ───
 
 export type ConnectionStatus =
-  | 'authenticating'
-  | 'connected'
-  | 'connecting'
-  | 'disconnected'
-  | 'reconnecting';
+  'authenticating' | 'connected' | 'connecting' | 'disconnected' | 'reconnecting';
 
 // ─── Client Events ───
 

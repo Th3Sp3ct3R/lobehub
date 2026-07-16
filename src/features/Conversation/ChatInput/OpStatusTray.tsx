@@ -42,6 +42,15 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
     border-start-start-radius: 0;
     border-start-end-radius: 0;
   `,
+  containerSeamless: css`
+    border: none;
+
+    /* keep a hairline divider on top so the tray still reads as separated from
+       the conversation above, even without the full card chrome */
+    border-block-start: 1px solid ${cssVar.colorBorderSecondary};
+    border-radius: 0;
+    background: transparent;
+  `,
   divider: css`
     width: 1px;
     height: 12px;
@@ -166,6 +175,10 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
     transform-box: fill-box;
     fill: ${cssVar.colorPrimary};
     animation: op-status-tray-glyph-core 1.5s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   `,
   glyphOrbit: css`
     transform-origin: center;
@@ -178,6 +191,10 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
     stroke-width: 1.5;
 
     animation: op-status-tray-glyph-spin 2s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   `,
 }));
 
@@ -208,6 +225,11 @@ const normalizeStepCount = (stepCount: unknown) => {
 
 interface OpStatusTrayProps {
   /**
+   * Drop the card chrome (background, border, rounded corners) so the status
+   * reads as a plain inline row — used when nothing is flush below it to attach to.
+   */
+  seamless?: boolean;
+  /**
    * Square the top corners when another panel sits flush above this one.
    */
   topAttached?: boolean;
@@ -221,7 +243,7 @@ interface MetricItem {
   value: string;
 }
 
-const OpStatusTray = memo<OpStatusTrayProps>(({ topAttached }) => {
+const OpStatusTray = memo<OpStatusTrayProps>(({ seamless, topAttached }) => {
   const { t } = useTranslation(['chat', 'opStatusTray']);
   const context = useConversationStore(contextSelectors.context);
   const dbMessages = useConversationStore(dataSelectors.dbMessages);
@@ -236,7 +258,8 @@ const OpStatusTray = memo<OpStatusTrayProps>(({ topAttached }) => {
     const runtimeOperationIds: string[] = [];
 
     for (const op of ops) {
-      if (op.status !== 'running' || op.metadata.isAborting) continue;
+      if (op.status !== 'running' || op.metadata.isAborting || op.metadata.visibleLoadingDone)
+        continue;
 
       const mapped = resolveOperationActivity(op.type);
       if (mapped && op.metadata.startTime > latestActivityStart) {
@@ -378,8 +401,12 @@ const OpStatusTray = memo<OpStatusTrayProps>(({ topAttached }) => {
     <Flexbox
       horizontal
       align="center"
-      className={cx(styles.container, topAttached && styles.containerTopAttached)}
       justify="space-between"
+      className={cx(
+        styles.container,
+        topAttached && styles.containerTopAttached,
+        seamless && styles.containerSeamless,
+      )}
     >
       <span className={cx(styles.metric, styles.statusMetric)}>
         <ActivityGlyph />

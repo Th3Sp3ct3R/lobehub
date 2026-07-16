@@ -22,6 +22,7 @@ export interface MessageGatewayConnectionStatus {
   config: { connectionId: string; platform: string } | null;
   state: {
     connectedAt?: number;
+    errorCode?: string;
     error?: string;
     platform: string;
     status: 'connected' | 'connecting' | 'disconnected' | 'dormant' | 'error';
@@ -79,10 +80,20 @@ export class MessageGatewayClient {
 
   // ─── Connection Management ───
 
-  async connect(config: MessageGatewayConnectionConfig): Promise<{ status: string }> {
+  /**
+   * `ensure: true` marks a reconcile-driven connect (periodic sync): when the
+   * gateway DO already holds an identical config it preserves its park/backoff
+   * state instead of resetting it — a parked connection answers 409. Omit for
+   * user-driven connects (credential saves, manual reconnect), which must
+   * always get a full fresh lifecycle.
+   */
+  async connect(
+    config: MessageGatewayConnectionConfig,
+    options?: { ensure?: boolean },
+  ): Promise<{ status: string }> {
     log('Connecting %s:%s (platform=%s)', config.connectionId, config.userId, config.platform);
 
-    const res = await this.post('/api/connections', { config });
+    const res = await this.post('/api/connections', { config, ensure: options?.ensure });
 
     if (!res.ok) {
       const error = await res.text();
@@ -155,6 +166,22 @@ export class MessageGatewayClient {
 
     if (!res.ok) {
       throw new Error(`message-gateway stats failed (${res.status})`);
+    }
+
+    return res.json();
+  }
+
+  /**
+   * All connectionIds the gateway has ever registered and not yet explicitly
+   * disconnected. Unlike `getStats` (which the AdminDO prunes after 30min of
+   * silence), this set retains dormant/hibernated connections, so it is the
+   * authoritative "actual" set for reconciliation.
+   */
+  async getRegisteredIds(): Promise<{ ids: string[] }> {
+    const res = await this.fetch('/api/admin/registered-ids');
+
+    if (!res.ok) {
+      throw new Error(`message-gateway registered-ids failed (${res.status})`);
     }
 
     return res.json();

@@ -6,16 +6,18 @@
  *   synchronous local-first read before the network resolves.
  */
 import { renderHook, waitFor } from '@testing-library/react';
-import { createElement, type PropsWithChildren } from 'react';
-import useSWR, { type Cache, SWRConfig } from 'swr';
-import { afterEach, describe, expect, it } from 'vitest';
+import type { PropsWithChildren } from 'react';
+import { createElement } from 'react';
+import useSWR, { type Cache, SWRConfig, unstable_serialize } from 'swr';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { localDataCache } from './localDataCache';
+import { LEGACY_MESSAGE_CACHE_VERSION, messageKeys } from './keys';
+import { buildLocalDataKey, localDataCache } from './localDataCache';
 import { createCacheProvider } from './localStorageProvider';
 
-const SCOPE = 'integration-scope';
+const SCOPE = 'integration-user:personal';
 
-const makeProvider = () => {
+const makeProvider = (idbPatterns = ['MSGS']) => {
   let resolveHydrated: () => void;
   const hydrated = new Promise<void>((r) => {
     resolveHydrated = r;
@@ -23,7 +25,7 @@ const makeProvider = () => {
   const provider = createCacheProvider({
     debounceMs: 5,
     getScope: () => SCOPE,
-    idbPatterns: ['MSGS'],
+    idbPatterns,
     localPatterns: [],
     onScopeHydrated: () => resolveHydrated(),
   });
@@ -62,12 +64,10 @@ describe('local-first cache chain (SWR + tiered provider + IndexedDB)', () => {
     r1.unmount();
 
     // --- session 2 ("reload"): fresh provider hydrates IndexedDB ------------
-    // Model the boot gate: create the cache and await IndexedDB hydration
-    // *before* the consuming component mounts, then hand SWR that hydrated map.
-    const { hydrated: hydrated2, provider: p2 } = makeProvider();
-    const hydratedMap = p2();
-    await hydrated2;
-    const stableProvider = (() => hydratedMap) as typeof p2;
+    // Model SPA bootstrap: hydrate the app-level provider before the consuming
+    // React tree mounts. SWR then receives the already-hydrated provider Map.
+    const { provider: p2 } = makeProvider();
+    await p2.hydrateScope?.();
 
     // a slow network so the local snapshot must win the first paint
     let resolveSlow: (v: unknown) => void;
@@ -75,7 +75,7 @@ describe('local-first cache chain (SWR + tiered provider + IndexedDB)', () => {
       resolveSlow = r;
     });
     const fetcher2 = () => slow;
-    const r2 = renderHook(() => useSWR(key, fetcher2), { wrapper: wrapper(stableProvider) });
+    const r2 = renderHook(() => useSWR(key, fetcher2), { wrapper: wrapper(p2) });
 
     // local-first: data is available synchronously from the hydrated cache,
     // before the slow fetch resolves
@@ -85,5 +85,40 @@ describe('local-first cache chain (SWR + tiered provider + IndexedDB)', () => {
     const serverV2 = [{ id: 'm1', text: 'revalidated' }];
     resolveSlow!(serverV2);
     await waitFor(() => expect(r2.result.current.data).toEqual(serverV2));
+  });
+
+  it('hydrates a migrated v1 message row through its canonical v2 key while offline', async () => {
+    const legacyOriginalKey = [
+      messageKeys.list.root,
+      { agentId: 'agent-1', scope: 'main', topicId: 'topic-1' },
+      LEGACY_MESSAGE_CACHE_VERSION,
+    ];
+    const legacySerializedKey = unstable_serialize(legacyOriginalKey);
+    const cachedMessages = [{ id: 'message-1', text: 'offline history' }];
+    await localDataCache.set(
+      buildLocalDataKey(SCOPE, legacySerializedKey),
+      { _k: legacyOriginalKey, data: cachedMessages },
+      '1.0.0',
+    );
+
+    const { provider } = makeProvider(['message:']);
+    await provider.hydrateScope?.();
+    const canonicalKey = messageKeys.list({ agentId: 'agent-1', topicId: 'topic-1' });
+    const fetcher = vi.fn(() => new Promise<never>(() => {}));
+    const result = renderHook(() => useSWR(canonicalKey, fetcher), {
+      wrapper: wrapper(provider),
+    });
+
+    expect(result.result.current.data).toEqual(cachedMessages);
+
+    const persisted = await localDataCache.entriesByScope(SCOPE);
+    expect(persisted.some((entry) => entry.key === legacySerializedKey)).toBe(false);
+    expect(persisted).toEqual([
+      expect.objectContaining({
+        data: expect.objectContaining({ _k: canonicalKey, data: cachedMessages }),
+        key: unstable_serialize(canonicalKey),
+      }),
+    ]);
+    result.unmount();
   });
 });

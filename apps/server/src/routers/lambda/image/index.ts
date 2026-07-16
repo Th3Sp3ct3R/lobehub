@@ -11,6 +11,7 @@ import { chargeBeforeGenerate } from '@/business/server/image-generation/chargeB
 import { withScopedPermission } from '@/business/server/trpc-middlewares/rbacPermission';
 import { wsCompatProcedure } from '@/business/server/trpc-middlewares/workspaceAuth';
 import { AsyncTaskModel } from '@/database/models/asyncTask';
+import { GenerationTopicModel } from '@/database/models/generationTopic';
 import { UserModel } from '@/database/models/user';
 import { type NewGeneration, type NewGenerationBatch } from '@/database/schemas';
 import { asyncTasks, generationBatches, generations } from '@/database/schemas';
@@ -38,6 +39,7 @@ const imageProcedure = wsCompatProcedure.use(serverDatabase).use(async (opts) =>
     ctx: {
       asyncTaskModel: new AsyncTaskModel(ctx.serverDB, ctx.userId, wsId),
       fileService: new FileService(ctx.serverDB, ctx.userId, wsId),
+      generationTopicModel: new GenerationTopicModel(ctx.serverDB, ctx.userId, wsId),
     },
   });
 });
@@ -54,7 +56,7 @@ const createImageInputSchema = z.object({
       height: z.number().optional(),
       imageUrls: z.array(z.string()).optional(),
       prompt: z.string(),
-      seed: z.number().nullable().optional(),
+      seed: z.number().nullish(),
       steps: z.number().optional(),
       width: z.number().optional(),
     })
@@ -67,7 +69,7 @@ export const imageRouter = router({
   createImage: imageCreateProcedure
     .input(createImageInputSchema)
     .mutation(async ({ input, ctx }) => {
-      const { userId, serverDB, asyncTaskModel, fileService } = ctx;
+      const { userId, serverDB, asyncTaskModel, fileService, generationTopicModel } = ctx;
       const wsId = ctx.workspaceId ?? undefined;
       const { generationTopicId, provider, model, imageNum, params } = input;
 
@@ -167,6 +169,11 @@ export const imageRouter = router({
       // Defensive check: ensure no full URLs enter the database
       validateNoUrlsInConfig(configForDatabase, 'configForDatabase');
 
+      const generationTopic = await generationTopicModel.findById(generationTopicId);
+      if (!generationTopic) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Invalid generation topic' });
+      }
+
       const chargeResult = await chargeBeforeGenerate({
         clientIp: ctx.clientIp,
         configForDatabase,
@@ -265,8 +272,8 @@ export const imageRouter = router({
 
       log('Database transaction completed successfully. Starting async task triggers directly.');
 
-      // Step 2: Trigger background image generation tasks using after() API
-      log('Starting async image generation tasks with after()');
+      // Step 2: Trigger background image generation tasks.
+      log('Starting async image generation tasks');
 
       try {
         log('Creating unified async caller for userId: %s', userId);
@@ -281,7 +288,7 @@ export const imageRouter = router({
 
         // Fire-and-forget: trigger async tasks without awaiting
         // These calls go to the async router which handles them independently
-        // Do NOT use after() here as it would keep the lambda alive unnecessarily
+        // Do not schedule here; the async router handles these tasks independently.
         generationsWithTasks.forEach(({ generation, asyncTaskId }) => {
           log('Starting background async task %s for generation %s', asyncTaskId, generation.id);
 

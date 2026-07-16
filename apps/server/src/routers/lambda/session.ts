@@ -13,6 +13,8 @@ import { LobeMetaDataSchema } from '@/types/meta';
 import { type BatchTaskResult } from '@/types/service';
 import { type ChatSessionList, type LobeGroupSession } from '@/types/session';
 
+import { assertWorkspaceRowManageable } from './_helpers/assertWorkspaceRowManageable';
+
 const sessionProcedure = wsCompatProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
   const wsId = ctx.workspaceId ?? undefined;
@@ -153,17 +155,13 @@ export const sessionRouter = router({
       return ctx.sessionModel.query({ current, pageSize });
     }),
 
-  // Owner-only — bulk wipes everyone's sessions in the workspace.
-  removeAllSessions: sessionProcedure
-    .use(withScopedPermission('session:delete'))
-    .mutation(async ({ ctx }) => {
-      return ctx.sessionModel.deleteAll();
-    }),
-
   removeSession: sessionProcedure
     .use(withScopedPermission('session:delete'))
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const session = await ctx.sessionModel.findByIdOrSlug(input.id);
+      if (session) assertWorkspaceRowManageable(ctx, session.userId, 'session');
+
       return ctx.sessionModel.delete(input.id);
     }),
 
@@ -182,6 +180,9 @@ export const sessionRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      const session = await ctx.sessionModel.findByIdOrSlug(input.id);
+      if (session) assertWorkspaceRowManageable(ctx, session.userId, 'session');
+
       return ctx.sessionModel.update(input.id, input.value);
     }),
   updateSessionChatConfig: sessionProcedure
@@ -193,6 +194,9 @@ export const sessionRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      const session = await ctx.sessionModel.findByIdOrSlug(input.id);
+      if (session) assertWorkspaceRowManageable(ctx, session.userId, 'session');
+
       return ctx.sessionModel.updateConfig(input.id, {
         chatConfig: input.value,
       });
@@ -206,6 +210,9 @@ export const sessionRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      const session = await ctx.sessionModel.findByIdOrSlug(input.id);
+      if (session) assertWorkspaceRowManageable(ctx, session.userId, 'session');
+
       return ctx.sessionModel.updateConfig(input.id, input.value);
     }),
 });

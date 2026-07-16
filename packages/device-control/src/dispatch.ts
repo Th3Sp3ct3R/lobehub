@@ -1,4 +1,5 @@
 import {
+  addGitWorktree,
   checkoutGitBranch,
   deleteGitBranch,
   getGitAheadBehind,
@@ -10,18 +11,28 @@ import {
   getLinkedPullRequest,
   listGitBranches,
   listGitRemoteBranches,
+  listGitWorktrees,
+  moveLocalFiles,
   pullGitBranch,
   pushGitBranch,
+  removeGitWorktree,
   renameGitBranch,
+  renameLocalFile,
   revertGitFile,
+  writeLocalFile,
 } from '@lobechat/local-file-shell';
 
+import { prepareSkillDirectory } from './skillDirectory';
 import type {
   DeviceControlDeps,
+  EnrollWorkspaceParams,
   InitWorkspaceParams,
   ListProjectSkillsParams,
   LocalFilePreviewUrlParams,
+  PrepareSkillDirectoryParams,
   ProjectFileIndexParams,
+  ProjectFileSearchParams,
+  UnenrollWorkspaceParams,
 } from './types';
 import { initWorkspace, listProjectSkills, statPath } from './workspace';
 
@@ -32,11 +43,18 @@ import { initWorkspace, listProjectSkills, statPath } from './workspace';
  * handler, with no per-method gateway route.
  */
 export const DEVICE_RPC_METHODS = [
+  'enrollWorkspace',
+  'unenrollWorkspace',
   'initWorkspace',
   'listProjectSkills',
+  'prepareSkillDirectory',
   'statPath',
   'getProjectFileIndex',
+  'searchProjectFiles',
   'getLocalFilePreview',
+  'moveLocalFiles',
+  'renameLocalFile',
+  'writeLocalFile',
   'getGitBranch',
   'getLinkedPullRequest',
   'getGitWorkingTreeStatus',
@@ -46,9 +64,12 @@ export const DEVICE_RPC_METHODS = [
   'getGitAheadBehind',
   'listGitBranches',
   'listGitRemoteBranches',
+  'listGitWorktrees',
   'checkoutGitBranch',
   'renameGitBranch',
   'deleteGitBranch',
+  'removeGitWorktree',
+  'addGitWorktree',
   'pullGitBranch',
   'pushGitBranch',
   'revertGitFile',
@@ -73,12 +94,31 @@ export const executeDeviceRpc = async (
   deps: DeviceControlDeps,
 ): Promise<unknown> => {
   switch (method) {
+    // Remote workspace share: the host owns the gateway connections, so both
+    // handlers are host-injected. A host that can't manage a second connection
+    // rejects with a stable reason the server surfaces to the user.
+    case 'enrollWorkspace': {
+      if (!deps.enrollWorkspace)
+        throw new Error('This device client does not support workspace sharing');
+      return deps.enrollWorkspace(params as EnrollWorkspaceParams);
+    }
+
+    case 'unenrollWorkspace': {
+      if (!deps.unenrollWorkspace)
+        throw new Error('This device client does not support workspace sharing');
+      return deps.unenrollWorkspace(params as UnenrollWorkspaceParams);
+    }
+
     case 'initWorkspace': {
       return initWorkspace(params as InitWorkspaceParams, deps);
     }
 
     case 'listProjectSkills': {
       return listProjectSkills(params as ListProjectSkillsParams, deps);
+    }
+
+    case 'prepareSkillDirectory': {
+      return prepareSkillDirectory(params as PrepareSkillDirectoryParams, deps);
     }
 
     case 'statPath': {
@@ -89,8 +129,24 @@ export const executeDeviceRpc = async (
       return deps.getProjectFileIndex(params as ProjectFileIndexParams);
     }
 
+    case 'searchProjectFiles': {
+      return deps.searchProjectFiles(params as ProjectFileSearchParams);
+    }
+
     case 'getLocalFilePreview': {
       return deps.getLocalFilePreview(params as LocalFilePreviewUrlParams);
+    }
+
+    case 'moveLocalFiles': {
+      return moveLocalFiles(params as { items: { newPath: string; oldPath: string }[] });
+    }
+
+    case 'renameLocalFile': {
+      return renameLocalFile(params as { newName: string; path: string });
+    }
+
+    case 'writeLocalFile': {
+      return writeLocalFile(params as { content: string; path: string });
     }
 
     case 'getGitBranch': {
@@ -98,7 +154,9 @@ export const executeDeviceRpc = async (
     }
 
     case 'getLinkedPullRequest': {
-      return getLinkedPullRequest(params as { branch: string; path: string });
+      return getLinkedPullRequest(
+        params as { branch: string; path: string; pullRequestNumber?: number },
+      );
     }
 
     case 'getGitWorkingTreeStatus': {
@@ -129,6 +187,10 @@ export const executeDeviceRpc = async (
       return listGitRemoteBranches((params as { path: string }).path);
     }
 
+    case 'listGitWorktrees': {
+      return listGitWorktrees((params as { path: string }).path);
+    }
+
     case 'checkoutGitBranch': {
       return checkoutGitBranch(params as { branch: string; create?: boolean; path: string });
     }
@@ -139,6 +201,14 @@ export const executeDeviceRpc = async (
 
     case 'deleteGitBranch': {
       return deleteGitBranch(params as { branch: string; path: string });
+    }
+
+    case 'removeGitWorktree': {
+      return removeGitWorktree(params as { path: string; worktreePath: string });
+    }
+
+    case 'addGitWorktree': {
+      return addGitWorktree(params as { branch: string; path: string; worktreePath: string });
     }
 
     case 'pullGitBranch': {

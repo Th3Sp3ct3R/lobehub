@@ -18,7 +18,7 @@ import { userRouter } from '../user';
 const mockAfterTasks = vi.hoisted((): Promise<void>[] => []);
 
 // Mock modules
-vi.mock('next/server', () => ({
+vi.mock('@/server/utils/scheduleAfterResponse', () => ({
   after: (callback: () => Promise<void> | void) => {
     mockAfterTasks.push(Promise.resolve(callback()));
   },
@@ -57,6 +57,26 @@ describe('userRouter', () => {
     vi.mocked(getReferralStatus).mockResolvedValue(undefined);
     vi.mocked(getSubscriptionPlan).mockResolvedValue(Plans.Free);
     vi.mocked(onUserActivityForBusiness).mockResolvedValue(undefined);
+  });
+
+  describe('getUserActivitySummary', () => {
+    it('returns the user-level activity summary', async () => {
+      const summary = {
+        lastUserMessageAt: new Date('2026-06-01T00:00:00.000Z'),
+        userCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
+      };
+      vi.mocked(UserModel).mockImplementation(
+        () =>
+          ({
+            getUserActivitySummary: vi.fn().mockResolvedValue(summary),
+          }) as any,
+      );
+
+      const result = await userRouter.createCaller({ ...mockCtx }).getUserActivitySummary();
+
+      expect(result).toEqual(summary);
+      expect(UserModel).toHaveBeenCalledWith(serverDB, mockUserId);
+    });
   });
 
   describe('getUserRegistrationDuration', () => {

@@ -56,7 +56,11 @@ const FileUpload = memo(() => {
   const model = useAgentStore((s) => agentByIdSelectors.getAgentModelById(agentId)(s));
   const provider = useAgentStore((s) => agentByIdSelectors.getAgentModelProviderById(agentId)(s));
 
-  const { canUploadImage, canUploadVideo } = useVisualMediaUploadAbility(model, provider);
+  const { canUploadImage, canUploadVideo, canUploadAudio } = useVisualMediaUploadAbility(
+    model,
+    provider,
+    agentId,
+  );
 
   const [showTip, updateGuideState] = useUserStore((s) => [
     preferenceSelectors.showUploadFileInKnowledgeBaseTip(s),
@@ -106,7 +110,7 @@ const FileUpload = memo(() => {
           beforeUpload={async (file) => {
             setDropdownOpen(false);
             editor?.focus();
-            await upload([file]);
+            await upload([file], agentId);
 
             return false;
           }}
@@ -130,7 +134,8 @@ const FileUpload = memo(() => {
           beforeUpload={async (file) => {
             if (
               (file.type.startsWith('image') && !canUploadImage) ||
-              (file.type.startsWith('video') && !canUploadVideo)
+              (file.type.startsWith('video') && !canUploadVideo) ||
+              (file.type.startsWith('audio') && !canUploadAudio)
             )
               return false;
 
@@ -148,7 +153,7 @@ const FileUpload = memo(() => {
 
             setDropdownOpen(false);
             editor?.focus();
-            await upload([file]);
+            await upload([file], agentId);
 
             return false;
           }}
@@ -169,7 +174,8 @@ const FileUpload = memo(() => {
           beforeUpload={async (file) => {
             if (
               (file.type.startsWith('image') && !canUploadImage) ||
-              (file.type.startsWith('video') && !canUploadVideo)
+              (file.type.startsWith('video') && !canUploadVideo) ||
+              (file.type.startsWith('audio') && !canUploadAudio)
             )
               return false;
 
@@ -187,7 +193,7 @@ const FileUpload = memo(() => {
 
             setDropdownOpen(false);
             editor?.focus();
-            await upload([file]);
+            await upload([file], agentId);
 
             return false;
           }}
@@ -246,21 +252,28 @@ const FileUpload = memo(() => {
     });
   }
 
-  // Always add the "View More" option
-  knowledgeItems.push(
-    {
-      type: 'divider',
-    },
-    {
-      extra: <Icon icon={ArrowRight} />,
-      icon: <Icon icon={LibraryBig} size={MENU_ICON_SIZE} />,
-      key: 'knowledge-base-store',
-      label: t('knowledgeBase.viewMore'),
-      onClick: () => {
-        openAttachKnowledgeModal();
+  if (knowledgeItems.length > 0) {
+    knowledgeItems.push(
+      {
+        type: 'divider',
       },
-    },
-  );
+      {
+        extra: <Icon icon={ArrowRight} />,
+        icon: <Icon icon={LibraryBig} size={MENU_ICON_SIZE} />,
+        key: 'knowledge-base-store',
+        label: t('knowledgeBase.viewMore'),
+        onClick: () => {
+          openAttachKnowledgeModal();
+        },
+      },
+    );
+  } else {
+    knowledgeItems.push({
+      disabled: true,
+      key: 'knowledge-empty',
+      label: t('knowledgeBase.related.empty'),
+    });
+  }
 
   const items: ActionDropdownMenuItems = [
     ...uploadItems,

@@ -62,6 +62,9 @@ export const componentMap = {
   [SettingsTabs.APIKey]: dynamic(() => import('../apikey'), {
     loading: loading('Settings > APIKey'),
   }),
+  [SettingsTabs.OAuthApps]: dynamic(() => import('../oauth-apps'), {
+    loading: loading('Settings > OAuthApps'),
+  }),
   [SettingsTabs.Creds]: dynamic(() => import('../creds'), {
     loading: loading('Settings > Creds'),
   }),
@@ -70,6 +73,9 @@ export const componentMap = {
   }),
   [SettingsTabs.Skill]: dynamic(() => import('../skill'), {
     loading: loading('Settings > Skill'),
+  }),
+  [SettingsTabs.Connector]: dynamic(() => import('../connector'), {
+    loading: loading('Settings > Connector'),
   }),
 
   [SettingsTabs.Plans]: dynamic(() => import('@/business/client/BusinessSettingPages/Plans'), {

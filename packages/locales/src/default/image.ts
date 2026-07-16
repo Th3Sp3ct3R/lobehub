@@ -7,6 +7,7 @@ export default {
   'config.header.title': 'Image',
   'config.height.label': 'Height',
   'config.imageNum.label': 'Number of Images',
+  'config.imageUpload.maxCountReached': 'You can add up to {{count}} reference images',
   'config.imageUrl.label': 'Reference Image',
   'config.imageUrls.label': 'Reference Images',
   'config.model.label': 'Model',
@@ -48,9 +49,14 @@ export default {
   'generation.actions.seedApplyFailed': 'Failed to Apply Seed',
   'generation.actions.seedCopied': 'Seed Copied to Clipboard',
   'generation.actions.seedCopyFailed': 'Failed to Copy Seed',
+  'generation.metadata.by': 'by {{name}}',
   'generation.metadata.count': '{{count}} Images',
+  'generation.metadata.createdAt': 'Created at {{time}}',
   'generation.status.failed': 'Generation hit a problem. Adjust the prompt and try again',
   'generation.status.generating': 'Generating...',
+  'generationTopic.notFound.desc':
+    'This generation does not exist or is no longer accessible — it may have been deleted or set to private by its owner.',
+  'generationTopic.notFound.title': 'Generation Unavailable',
   'notSupportGuide.desc':
     'The current deployment mode does not support AI image generation. Switch to the <1>server database deployment mode</1>, or use <3>LobeHub Cloud</3>.',
   'notSupportGuide.features.fileIntegration.desc':
@@ -64,10 +70,15 @@ export default {
   'notSupportGuide.features.multiProviders.title': 'Multi-Provider Support',
   'notSupportGuide.title': 'Current Deployment Mode Does Not Support AI Image Generation',
   'topic.createNew': 'Create New Topic',
+  'topic.createdBy': 'Created by {{name}}',
   'topic.deleteConfirm': 'Delete Generation Topic',
   'topic.deleteConfirmDesc':
     'You are about to delete this generation topic. This action cannot be undone, please proceed with caution.',
   'topic.empty': 'No generation topics',
+  'topic.privateTitle': 'Private',
   'topic.title': 'Image Topic',
   'topic.untitled': 'Default Topic',
+  'topic.visibility.existingLocked':
+    'Visibility is fixed for the current topic. Create a new topic to choose a different space.',
+  'topic.workspaceTitle': 'Workspace',
 };

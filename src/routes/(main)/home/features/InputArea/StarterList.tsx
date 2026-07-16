@@ -1,5 +1,6 @@
 import { ModelIcon } from '@lobehub/icons';
-import { Button, Center, Skeleton, Tag, Tooltip } from '@lobehub/ui';
+import { Center, Skeleton, Tag, Tooltip } from '@lobehub/ui';
+import { Button } from '@lobehub/ui/base-ui';
 import { App } from 'antd';
 import { createStaticStyles, cx } from 'antd-style';
 import { memo, useCallback, useState } from 'react';
@@ -11,14 +12,15 @@ import {
 } from '@/business/client/hooks/useBusinessAgentMode';
 import type { HomeNewModelItem } from '@/business/client/hooks/useHomeNewModels';
 import { useHomeNewModels } from '@/business/client/hooks/useHomeNewModels';
+import { useWorkspaceAwareNavigate } from '@/features/Workspace/useWorkspaceAwareNavigate';
 import { usePermission } from '@/hooks/usePermission';
-import { useStableNavigate } from '@/hooks/useStableNavigate';
 import { agentService } from '@/services/agent';
 import { useAgentStore } from '@/store/agent';
 import { agentByIdSelectors } from '@/store/agent/selectors';
 
 import { useResolvedHomeAgentId } from '../AgentSelect/useResolvedHomeAgentId';
-import { DEFAULT_HOME_NEW_MODELS, NEW_CHAT_PROVIDER } from './starterModels';
+import { trackHomeModelShortcutClicked } from './starterListAnalytics';
+import { useStarterModelDefaults } from './useStarterModelDefaults';
 
 const styles = createStaticStyles(({ css, cssVar }) => ({
   button: css`
@@ -42,18 +44,20 @@ const styles = createStaticStyles(({ css, cssVar }) => ({
 }));
 
 const getStarterItemKey = (item: HomeNewModelItem) => `${item.type}:${item.model}`;
-const getStarterItemProvider = (item: HomeNewModelItem) => item.provider ?? NEW_CHAT_PROVIDER;
+const getStarterItemProvider = (item: HomeNewModelItem, fallbackProvider: string) =>
+  item.provider ?? fallbackProvider;
 const skeletonWidths = [112, 150, 126, 138];
 
 const StarterList = memo(() => {
   const { t } = useTranslation('home');
-  const navigate = useStableNavigate();
+  const navigate = useWorkspaceAwareNavigate();
   const { message } = App.useApp();
   const { agentId: activeAgentId } = useResolvedHomeAgentId();
   const { allowed: canCreateContent, reason } = usePermission('create_content');
   const updateAgentConfigById = useAgentStore((s) => s.updateAgentConfigById);
   const [switchingKey, setSwitchingKey] = useState<string | null>(null);
-  const { isLoading, items } = useHomeNewModels(DEFAULT_HOME_NEW_MODELS);
+  const { defaultHomeNewModels, fallbackChatProvider } = useStarterModelDefaults();
+  const { isLoading, items } = useHomeNewModels(defaultHomeNewModels);
   const applyBusinessModelModeConfig = useBusinessModelModeConfig();
 
   const handleClick = useCallback(
@@ -61,6 +65,9 @@ const StarterList = memo(() => {
       if (!canCreateContent) return;
 
       const key = getStarterItemKey(item);
+      const selectedProvider =
+        item.type === 'chat' ? getStarterItemProvider(item, fallbackChatProvider) : item.provider;
+      void trackHomeModelShortcutClicked({ item, provider: selectedProvider });
 
       if (item.type === 'video') {
         navigate(`/video?model=${item.model}`);
@@ -75,7 +82,7 @@ const StarterList = memo(() => {
       if (item.type === 'chat') {
         if (!activeAgentId || switchingKey) return;
         setSwitchingKey(key);
-        const provider = getStarterItemProvider(item);
+        const provider = getStarterItemProvider(item, fallbackChatProvider);
         try {
           // Hydrate the agent's config before mutating so the optimistic update
           // doesn't drop pre-existing fields the home input never loaded.
@@ -106,8 +113,12 @@ const StarterList = memo(() => {
             return;
           }
 
-          await updateAgentConfigById(activeAgentId, nextConfig);
-          message.success(t('starter.modelSwitched', { name: item.title }));
+          try {
+            await updateAgentConfigById(activeAgentId, nextConfig, { rethrow: true });
+            message.success(t('starter.modelSwitched', { name: item.title }));
+          } catch {
+            // The agent store already reports persistence failures to the user.
+          }
         } finally {
           setSwitchingKey(null);
         }
@@ -121,6 +132,7 @@ const StarterList = memo(() => {
       applyBusinessModelModeConfig,
       updateAgentConfigById,
       switchingKey,
+      fallbackChatProvider,
       message,
       t,
     ],
@@ -132,7 +144,7 @@ const StarterList = memo(() => {
         {t('starter.newLabel')}
       </Tag>
       {isLoading
-        ? DEFAULT_HOME_NEW_MODELS.map((item, index) => (
+        ? defaultHomeNewModels.map((item, index) => (
             <Skeleton.Button
               active
               key={getStarterItemKey(item)}
@@ -154,7 +166,6 @@ const StarterList = memo(() => {
                 key={key}
                 loading={isSwitching}
                 shape={'round'}
-                variant={'outlined'}
                 onClick={() => handleClick(item)}
               >
                 {item.title}

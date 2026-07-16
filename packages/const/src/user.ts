@@ -13,9 +13,12 @@ export const DEFAULT_PREFERENCE: UserPreference = {
     topic: true,
   },
   lab: {
-    enableAgentDocumentFloatingChatPanel: false,
+    enableAgentGraphConfig: false,
     enableAgentSelfIteration: false,
+    enableFleet: false,
     enableInputMarkdown: true,
+    enableMessageTextSelectionActions: false,
+    enableOAuthApps: false,
     enablePlatformAgent: false,
   },
   topicGroupMode: 'byTime',
