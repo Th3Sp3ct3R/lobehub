@@ -2,6 +2,19 @@
 
 Guidelines for using AI coding agents in this LobeHub repository.
 
+## AzA Memory Routing
+
+- Treat `/Users/growthgod/lobehub` as the harness/operator UI, not the canonical
+  memory database.
+- Treat `/Users/growthgod/VAN/aza_memory` as the canonical AzA memory backend.
+- Follow `/Users/growthgod/VAN/aza_memory/docs/MEMORY_ROUTING_CONTRACT.md`
+  before adding or changing AzA memory, session, approval, or Obsidian
+  projection behavior.
+- `/Users/growthgod/Documents/VANTA-Brain` is the reviewed Obsidian projection
+  vault. Do not write to it from LobeHub unless the target path, YAML
+  frontmatter, redaction proof, source provenance, and approval state are
+  explicit.
+
 ## Tech Stack
 
 - Next.js 16 + React 19 + TypeScript

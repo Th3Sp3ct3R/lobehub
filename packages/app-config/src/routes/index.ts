@@ -37,6 +37,16 @@ export interface NavigationRoute {
  */
 export const NAVIGATION_ROUTES: NavigationRoute[] = [
   {
+    cmdkKey: 'cmdk.aza',
+    electronKey: 'navigation.aza',
+    icon: BrainCircuit,
+    id: 'aza',
+    keywords: ['aza', 'command', 'architecture', 'memory', 'agents', 'gtm'],
+    keywordsKey: 'cmdk.keywords.aza',
+    path: '/aza',
+    pathPrefix: '/aza',
+  },
+  {
     cmdkKey: 'cmdk.community',
     electronKey: 'navigation.discover',
     icon: ShapesIcon,
@@ -130,5 +140,5 @@ export const getRouteById = (id: string): NavigationRoute | undefined =>
  */
 export const getNavigableRoutes = (): NavigationRoute[] =>
   NAVIGATION_ROUTES.filter((r) =>
-    ['community', 'video', 'image', 'resource', 'page', 'memory'].includes(r.id),
+    ['aza', 'community', 'video', 'image', 'resource', 'page', 'memory'].includes(r.id),
   );

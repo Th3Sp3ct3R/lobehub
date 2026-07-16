@@ -469,6 +469,21 @@ export const sharedMainAreaChildren: RouteObject[] = [
     path: 'memory',
   },
 
+  // AzA command center routes
+  {
+    children: [
+      {
+        element: dynamicElement(() => import('@/routes/(main)/aza'), 'Desktop > AzA'),
+        handle: {
+          meta: routeMeta({ icon: BrainCircuit, titleKey: 'navigation.aza' }),
+        },
+        index: true,
+      },
+    ],
+    errorElement: <ErrorBoundary />,
+    path: 'aza',
+  },
+
   // Video routes
   {
     children: [

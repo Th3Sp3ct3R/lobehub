@@ -51,6 +51,7 @@ import { agentRouteMeta } from '@/routes/(main)/agent/features/routeMeta';
 import AgentProfilePage from '@/routes/(main)/agent/profile';
 import AgentTaskDetailRoute from '@/routes/(main)/agent/task/[taskId]';
 import AgentTopicsPage from '@/routes/(main)/agent/topics';
+import AzaPage from '@/routes/(main)/aza';
 import CommunityLayout from '@/routes/(main)/community/_layout';
 import CommunityDetailLayout from '@/routes/(main)/community/(detail)/_layout';
 import CommunityDetailAgentPage from '@/routes/(main)/community/(detail)/agent';
@@ -425,6 +426,21 @@ export const sharedMainAreaChildren: RouteObject[] = [
     element: <DesktopMemoryLayout />,
     errorElement: <ErrorBoundary />,
     path: 'memory',
+  },
+
+  // AzA command center routes
+  {
+    children: [
+      {
+        element: <AzaPage />,
+        handle: {
+          meta: routeMeta({ icon: BrainCircuit, titleKey: 'navigation.aza' }),
+        },
+        index: true,
+      },
+    ],
+    errorElement: <ErrorBoundary />,
+    path: 'aza',
   },
 
   // Video routes

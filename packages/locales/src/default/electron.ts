@@ -1,4 +1,5 @@
 export default {
+  'navigation.aza': 'AzA',
   'navigation.chat': 'Chat',
   'navigation.discover': 'Discover',
   'navigation.discoverAssistants': 'Discover Assistants',

@@ -12,6 +12,7 @@ interface CustomNextConfig {
   redirects?: Redirect[];
   serverExternalPackages?: NextConfig['serverExternalPackages'];
   turbopack?: NextConfig['turbopack'];
+  webpack?: NextConfig['webpack'];
 }
 
 export function defineConfig(config: CustomNextConfig) {
@@ -357,13 +358,89 @@ export function defineConfig(config: CustomNextConfig) {
     // pdfjs-dist uses @napi-rs/canvas for DOMMatrix polyfill in Node.js environment
     serverExternalPackages: config.serverExternalPackages ?? [
       'pdfkit',
+      '@grpc/grpc-js',
+      '@grpc/proto-loader',
       '@napi-rs/canvas',
+      '@opentelemetry/api-logs',
+      '@opentelemetry/auto-instrumentations-node',
+      '@opentelemetry/configuration',
+      '@opentelemetry/context-async-hooks',
+      '@opentelemetry/core',
+      '@opentelemetry/exporter-logs-otlp-grpc',
+      '@opentelemetry/exporter-logs-otlp-http',
+      '@opentelemetry/exporter-logs-otlp-proto',
+      '@opentelemetry/exporter-metrics-otlp-grpc',
+      '@opentelemetry/exporter-metrics-otlp-http',
+      '@opentelemetry/exporter-metrics-otlp-proto',
+      '@opentelemetry/exporter-prometheus',
+      '@opentelemetry/exporter-trace-otlp-grpc',
+      '@opentelemetry/exporter-trace-otlp-http',
+      '@opentelemetry/exporter-trace-otlp-proto',
+      '@opentelemetry/exporter-zipkin',
+      '@opentelemetry/instrumentation',
+      '@opentelemetry/instrumentation-amqplib',
+      '@opentelemetry/instrumentation-aws-lambda',
+      '@opentelemetry/instrumentation-aws-sdk',
+      '@opentelemetry/instrumentation-bunyan',
+      '@opentelemetry/instrumentation-cassandra-driver',
+      '@opentelemetry/instrumentation-connect',
+      '@opentelemetry/instrumentation-cucumber',
+      '@opentelemetry/instrumentation-dataloader',
+      '@opentelemetry/instrumentation-dns',
+      '@opentelemetry/instrumentation-express',
+      '@opentelemetry/instrumentation-fs',
+      '@opentelemetry/instrumentation-generic-pool',
+      '@opentelemetry/instrumentation-graphql',
+      '@opentelemetry/instrumentation-grpc',
+      '@opentelemetry/instrumentation-hapi',
+      '@opentelemetry/instrumentation-http',
+      '@opentelemetry/instrumentation-ioredis',
+      '@opentelemetry/instrumentation-kafkajs',
+      '@opentelemetry/instrumentation-knex',
+      '@opentelemetry/instrumentation-koa',
+      '@opentelemetry/instrumentation-lru-memoizer',
+      '@opentelemetry/instrumentation-memcached',
+      '@opentelemetry/instrumentation-mongodb',
+      '@opentelemetry/instrumentation-mongoose',
+      '@opentelemetry/instrumentation-mysql',
+      '@opentelemetry/instrumentation-mysql2',
+      '@opentelemetry/instrumentation-nestjs-core',
+      '@opentelemetry/instrumentation-net',
+      '@opentelemetry/instrumentation-openai',
+      '@opentelemetry/instrumentation-oracledb',
+      '@opentelemetry/instrumentation-pg',
+      '@opentelemetry/instrumentation-pino',
+      '@opentelemetry/instrumentation-redis',
+      '@opentelemetry/instrumentation-restify',
+      '@opentelemetry/instrumentation-router',
+      '@opentelemetry/instrumentation-runtime-node',
+      '@opentelemetry/instrumentation-socket.io',
+      '@opentelemetry/instrumentation-tedious',
+      '@opentelemetry/instrumentation-undici',
+      '@opentelemetry/instrumentation-winston',
+      '@opentelemetry/otlp-exporter-base',
+      '@opentelemetry/otlp-grpc-exporter-base',
+      '@opentelemetry/propagator-b3',
+      '@opentelemetry/propagator-jaeger',
+      '@opentelemetry/resource-detector-alibaba-cloud',
+      '@opentelemetry/resource-detector-aws',
+      '@opentelemetry/resource-detector-azure',
+      '@opentelemetry/resource-detector-container',
+      '@opentelemetry/resource-detector-gcp',
+      '@opentelemetry/resources',
+      '@opentelemetry/sdk-logs',
+      '@opentelemetry/sdk-metrics',
+      '@opentelemetry/sdk-node',
+      '@opentelemetry/sdk-trace-base',
+      '@opentelemetry/sdk-trace-node',
+      '@opentelemetry/semantic-conventions',
       '@lobehub/editor',
       'discord.js',
       'ffmpeg-static',
       'pdfjs-dist',
       'ajv',
       'oidc-provider',
+      'zlib-sync',
     ],
 
     transpilePackages: ['mermaid'],
@@ -385,6 +462,33 @@ export function defineConfig(config: CustomNextConfig) {
 
     typescript: {
       ignoreBuildErrors: true,
+    },
+    webpack(webpackConfig, context) {
+      if (context.isServer) {
+        const externalizeNodeInstrumentation = (
+          { request }: { request?: string },
+          callback: (error?: Error | null, result?: string) => void,
+        ) => {
+          if (
+            request &&
+            (request.startsWith('node:') ||
+              request.startsWith('@grpc/') ||
+              request.startsWith('@opentelemetry/') ||
+              request === 'zlib-sync')
+          ) {
+            return callback(null, `commonjs ${request}`);
+          }
+
+          callback();
+        };
+
+        const externals = webpackConfig.externals ?? [];
+        webpackConfig.externals = Array.isArray(externals)
+          ? [...externals, externalizeNodeInstrumentation]
+          : [externals, externalizeNodeInstrumentation];
+      }
+
+      return config.webpack?.(webpackConfig, context) ?? webpackConfig;
     },
   };
 

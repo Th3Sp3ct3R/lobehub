@@ -128,6 +128,7 @@ export default {
   'cmdk.askAgentHeading': 'Ask Agent',
   'cmdk.askAgentPlaceholder': 'Ask {{agent}} something...',
   'cmdk.askLobeAI': 'Ask Lobe AI',
+  'cmdk.aza': 'AzA',
   'cmdk.community': 'Community',
   'cmdk.communitySupport': 'Community Support',
   'cmdk.contactUs': 'Contact Us',
@@ -150,6 +151,8 @@ export default {
   'cmdk.keywords.apikey': 'apikey api key token',
 
   'cmdk.keywords.appearance': 'common appearance theme display',
+
+  'cmdk.keywords.aza': 'aza command architecture memory agents gtm',
 
   'cmdk.keywords.billing': 'billing payment invoice transaction',
 
@@ -506,6 +509,7 @@ export default {
     'Signaling server connection failed, and peer-to-peer communication channel cannot be established. Please check the network and try again.',
   'tab.image': 'Image',
   'tab.audio': 'Audio',
+  'tab.aza': 'AzA',
   'tab.chat': 'Chat',
   'recents': 'Recents',
   'tab.community': 'Community',

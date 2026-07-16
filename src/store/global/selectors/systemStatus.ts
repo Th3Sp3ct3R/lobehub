@@ -69,6 +69,7 @@ export const SIDEBAR_SPACER_ID = '__spacer__';
 export const DEFAULT_SIDEBAR_ITEMS: string[] = [
   'tasks',
   'pages',
+  'aza',
   'recents',
   'agent',
   SIDEBAR_SPACER_ID,
