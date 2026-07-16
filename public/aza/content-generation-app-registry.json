@@ -1,0 +1,346 @@
+{
+  "automationModes": {
+    "blocked": "No automation until purpose, account, output path, and risk are classified.",
+    "draft_only": "The app can produce drafts, prompts, scripts, or assets, but publishing and account actions require review.",
+    "human_approve": "The app can be prepared by an agent, but final send, post, publish, purchase, or account-changing action requires explicit approval.",
+    "read_only": "The app can be inventoried and referenced, but no app interaction or content capture is allowed without a narrower approval.",
+    "reviewed_capture": "The app can produce artifacts only after the operator reviews what will be captured and where it will be stored."
+  },
+  "candidateAppsPendingVerification": [
+    "ChatGPT Atlas",
+    "Claude",
+    "Qwen",
+    "OpenHuman",
+    "Ollama",
+    "Pinokio",
+    "Replit",
+    "Descript",
+    "CapCut Web",
+    "Google Docs",
+    "Google Slides",
+    "Google Sheets",
+    "Google Drive",
+    "Obsidian",
+    "Tango Desktop",
+    "GeeLark",
+    "VMOSCloud",
+    "WhatsApp 2",
+    "Linear",
+    "AnyDesk"
+  ],
+  "contentStages": [
+    {
+      "id": "research",
+      "name": "Research and source gathering",
+      "recordTypes": ["source", "research_note", "evidence"],
+      "requiredEvidence": [
+        "source url or local path",
+        "capture timestamp",
+        "owner",
+        "sensitivity label"
+      ]
+    },
+    {
+      "id": "strategy",
+      "name": "Offer, angle, and prompt strategy",
+      "recordTypes": ["offer", "content_campaign", "prompt", "decision"],
+      "requiredEvidence": ["target segment", "offer id", "campaign goal", "approval status"]
+    },
+    {
+      "id": "generation",
+      "name": "AI text, image, audio, and video generation",
+      "recordTypes": ["asset", "prompt", "generation_run", "artifact"],
+      "requiredEvidence": ["source app", "model or tool label", "prompt pointer", "export path"]
+    },
+    {
+      "id": "editing",
+      "name": "Packaging, edit, and review",
+      "recordTypes": ["asset_revision", "review", "artifact", "evidence"],
+      "requiredEvidence": ["input asset", "output asset", "reviewer", "change summary"]
+    },
+    {
+      "id": "publishing",
+      "name": "Distribution and scheduled publishing",
+      "recordTypes": ["publish_event", "approval", "content_campaign"],
+      "requiredEvidence": ["target channel", "account label", "scheduled time", "human approval"]
+    },
+    {
+      "id": "measurement",
+      "name": "Analytics and learning",
+      "recordTypes": ["analytics_snapshot", "experiment", "decision"],
+      "requiredEvidence": ["metric source", "time window", "result", "next decision"]
+    },
+    {
+      "id": "projection",
+      "name": "AzA memory and VANTA-Brain projection",
+      "recordTypes": ["memory_record", "projection", "decision"],
+      "requiredEvidence": ["canonical AzA id", "redaction status", "projection approval"]
+    }
+  ],
+  "currentObservedApps": [
+    {
+      "name": "LobeHub",
+      "bundleId": "com.lobehub.lobehub-desktop",
+      "role": "command_harness",
+      "contentStage": ["strategy", "projection"],
+      "automationMode": "human_approve",
+      "allowedActions": [
+        "show campaign status",
+        "route tasks",
+        "open artifact links",
+        "request approval"
+      ],
+      "blockedActions": [
+        "write canonical memory until AzA health is live",
+        "publish content directly"
+      ],
+      "azaRecords": ["content_campaign", "task", "approval", "memory_record"]
+    },
+    {
+      "name": "Codex",
+      "bundleId": "com.openai.codex",
+      "role": "coding_executor",
+      "contentStage": ["editing", "projection"],
+      "automationMode": "human_approve",
+      "allowedActions": [
+        "build adapters",
+        "validate artifacts",
+        "capture screenshots",
+        "update approved LobeHub surfaces"
+      ],
+      "blockedActions": [
+        "write VAN without approval",
+        "write VANTA-Brain during this pass",
+        "store raw secrets"
+      ],
+      "azaRecords": ["task", "evidence", "artifact", "decision"]
+    },
+    {
+      "name": "Google Chrome",
+      "bundleId": "com.google.Chrome",
+      "role": "browser_webapp_surface",
+      "contentStage": ["research", "publishing", "measurement"],
+      "automationMode": "read_only",
+      "allowedActions": ["list as browser surface", "capture approved public source references"],
+      "blockedActions": [
+        "read private tabs without approval",
+        "send messages",
+        "post content",
+        "capture cookies or tokens"
+      ],
+      "azaRecords": ["source", "app_surface", "evidence"]
+    },
+    {
+      "name": "Comet",
+      "bundleId": "ai.perplexity.comet",
+      "role": "research_browser",
+      "contentStage": ["research", "strategy"],
+      "automationMode": "reviewed_capture",
+      "allowedActions": ["research capture after review", "summarize approved sources"],
+      "blockedActions": [
+        "blind browsing capture",
+        "private account capture",
+        "unapproved interactions"
+      ],
+      "azaRecords": ["source", "research_note", "evidence"]
+    },
+    {
+      "name": "Kimi",
+      "bundleId": "com.moonshot.kimichat",
+      "role": "long_context_generation",
+      "contentStage": ["research", "strategy", "generation"],
+      "automationMode": "draft_only",
+      "allowedActions": [
+        "draft long-form content",
+        "summarize approved documents",
+        "create prompt variants"
+      ],
+      "blockedActions": ["publish directly", "store raw private documents without review"],
+      "azaRecords": ["prompt", "draft", "asset", "decision"]
+    },
+    {
+      "name": "Gemini",
+      "bundleId": "com.google.GeminiMacOS",
+      "role": "multimodal_generation",
+      "contentStage": ["research", "generation"],
+      "automationMode": "draft_only",
+      "allowedActions": ["draft multimodal content", "produce reviewed asset concepts"],
+      "blockedActions": ["publish directly", "capture Google account contents without approval"],
+      "azaRecords": ["prompt", "asset", "generation_run"]
+    },
+    {
+      "name": "MiniMax Hub",
+      "bundleId": "com.minimax.hub.global",
+      "role": "media_generation",
+      "contentStage": ["generation", "editing"],
+      "automationMode": "reviewed_capture",
+      "allowedActions": [
+        "register generated media exports",
+        "capture prompt and output metadata after review"
+      ],
+      "blockedActions": [
+        "store raw credentials",
+        "publish directly",
+        "capture unreviewed private media"
+      ],
+      "azaRecords": ["prompt", "generation_run", "asset", "artifact"]
+    },
+    {
+      "name": "Cluely (New)",
+      "bundleId": "com.cluely.app.april22",
+      "role": "ai_assistant_pending_classification",
+      "contentStage": ["research", "strategy"],
+      "automationMode": "blocked",
+      "allowedActions": ["inventory only"],
+      "blockedActions": ["automation", "capture", "publishing", "private context reading"],
+      "azaRecords": ["app_surface"]
+    },
+    {
+      "name": "CovenCave",
+      "bundleId": "ai.opencoven.cave",
+      "role": "ai_tool_pending_classification",
+      "contentStage": ["research", "generation"],
+      "automationMode": "blocked",
+      "allowedActions": ["inventory only"],
+      "blockedActions": ["automation", "capture", "publishing", "private context reading"],
+      "azaRecords": ["app_surface"]
+    },
+    {
+      "name": "Wispr Flow",
+      "bundleId": "com.electron.wispr-flow",
+      "role": "voice_input",
+      "contentStage": ["research", "generation"],
+      "automationMode": "reviewed_capture",
+      "allowedActions": [
+        "capture reviewed transcript exports",
+        "link transcript artifacts to content campaigns"
+      ],
+      "blockedActions": ["record or index private audio without explicit selection"],
+      "azaRecords": ["source", "transcript", "artifact"]
+    },
+    {
+      "name": "Willow Voice",
+      "bundleId": "com.seewillow.WillowMac",
+      "role": "voice_input",
+      "contentStage": ["research", "generation"],
+      "automationMode": "reviewed_capture",
+      "allowedActions": ["capture reviewed transcript exports"],
+      "blockedActions": ["record or index private audio without explicit selection"],
+      "azaRecords": ["source", "transcript", "artifact"]
+    },
+    {
+      "name": "Voice Memos",
+      "bundleId": "com.apple.VoiceMemos",
+      "role": "audio_capture",
+      "contentStage": ["research", "generation"],
+      "automationMode": "human_approve",
+      "allowedActions": ["register explicitly selected recordings as assets"],
+      "blockedActions": ["bulk index recordings", "capture private audio without selection"],
+      "azaRecords": ["source", "asset", "artifact"]
+    },
+    {
+      "name": "Notion",
+      "bundleId": "notion.id",
+      "role": "knowledge_workspace",
+      "contentStage": ["strategy", "editing", "projection"],
+      "automationMode": "human_approve",
+      "allowedActions": ["read or write approved pages only", "link campaign docs"],
+      "blockedActions": ["workspace-wide capture", "unapproved page writes"],
+      "azaRecords": ["source", "draft", "decision", "projection"]
+    },
+    {
+      "name": "Discord",
+      "bundleId": "com.hnc.Discord",
+      "role": "community_and_coordination",
+      "contentStage": ["publishing", "measurement"],
+      "automationMode": "human_approve",
+      "allowedActions": ["prepare approved post drafts", "store high-level community summary"],
+      "blockedActions": [
+        "read private messages",
+        "send messages without approval",
+        "capture private content"
+      ],
+      "azaRecords": ["publish_event", "approval", "evidence"]
+    },
+    {
+      "name": "Telegram",
+      "bundleId": "com.tdesktop.Telegram",
+      "role": "channel_and_bot_coordination",
+      "contentStage": ["publishing", "measurement"],
+      "automationMode": "human_approve",
+      "allowedActions": ["prepare approved command or post drafts", "store bot status summaries"],
+      "blockedActions": ["send messages without approval", "capture private chats"],
+      "azaRecords": ["publish_event", "approval", "evidence"]
+    },
+    {
+      "name": "DuoPlus",
+      "bundleId": "com.duoplus.app",
+      "role": "device_distribution_surface",
+      "contentStage": ["publishing", "measurement"],
+      "automationMode": "human_approve",
+      "allowedActions": ["inventory device status", "capture approved evidence screenshots"],
+      "blockedActions": [
+        "account-changing actions",
+        "posting",
+        "messaging",
+        "following",
+        "purchasing without approval"
+      ],
+      "azaRecords": ["device", "approval", "publish_event", "evidence"]
+    }
+  ],
+  "requiredRegistryFields": [
+    "app_id",
+    "name",
+    "bundle_id",
+    "install_path",
+    "surface_type",
+    "content_stage",
+    "content_role",
+    "related_agent",
+    "related_project",
+    "account_label",
+    "auth_pointer",
+    "default_import_path",
+    "default_export_path",
+    "output_kinds",
+    "automation_mode",
+    "allowed_actions",
+    "blocked_actions",
+    "approval_required_for",
+    "last_verified_at",
+    "evidence_pointer",
+    "aza_record_links"
+  ],
+  "source": {
+    "currentSnapshot": "computer-use:list_apps on 2026-07-02",
+    "safeInventoryArtifact": "/aza/app-surface-inventory.json"
+  },
+  "writeBackPlan": [
+    {
+      "step": "register_app_surface",
+      "targetRecord": "app_surface",
+      "rule": "Store only app metadata, purpose, owner, mode, and evidence pointer."
+    },
+    {
+      "step": "register_campaign",
+      "targetRecord": "content_campaign",
+      "rule": "Connect offer, audience, source app, asset list, publishing target, and approval state."
+    },
+    {
+      "step": "register_asset",
+      "targetRecord": "asset",
+      "rule": "Track generated media, transcript, screenshot, document, or export with source app and output path."
+    },
+    {
+      "step": "register_publish_event",
+      "targetRecord": "publish_event",
+      "rule": "Record channel, account label, scheduled time, approval, and post-publication evidence."
+    },
+    {
+      "step": "register_learning",
+      "targetRecord": "analytics_snapshot",
+      "rule": "Capture metrics, time window, result, and next decision without scraping private data."
+    }
+  ]
+}

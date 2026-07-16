@@ -1,0 +1,264 @@
+{
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Mac workstation: /Users/growthgod",
+      "wraps": [
+        "codex",
+        "codexMemory",
+        "van",
+        "hermes",
+        "lobehub",
+        "aza",
+        "brain",
+        "contentApps",
+        "browserApps",
+        "deviceLane",
+        "sync"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Canonical memory plane",
+      "wraps": ["lobehub", "aza", "brain"]
+    },
+    {
+      "kind": "region",
+      "label": "Runtime and evidence sources",
+      "wraps": ["codexMemory", "van", "hermes", "contentApps", "browserApps", "deviceLane", "sync"]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Control",
+      "items": [
+        "LobeHub is the operator harness.",
+        "Codex is the coding executor inside it.",
+        "Writes should show target, sensitivity, and rollback before execution."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Memory",
+      "items": [
+        "AzA should be the canonical durable brain.",
+        "Agent skills stay scoped, but durable facts promote into AzA with provenance.",
+        "VANTA-Brain remains a readable projection vault."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Known gates",
+      "items": [
+        "AzA services and typecheck still need repair.",
+        "VANTA-Brain sync has stale Desktop/VAN pointers and rebase failures.",
+        "Content apps need login/output/export registry."
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "architect",
+      "type": "external",
+      "label": "Architect",
+      "sublabel": "You",
+      "pos": [34, 350],
+      "size": [120, 70]
+    },
+    {
+      "id": "codex",
+      "type": "backend",
+      "label": "Codex Executor",
+      "sublabel": "~/.codex goals + worktrees",
+      "pos": [220, 353],
+      "size": [150, 64],
+      "tag": "executes"
+    },
+    {
+      "id": "codexMemory",
+      "type": "database",
+      "label": "Codex Memory",
+      "sublabel": "rollouts, skills, state",
+      "pos": [220, 130],
+      "size": [150, 64]
+    },
+    {
+      "id": "van",
+      "type": "cloud",
+      "label": "VAN Repos",
+      "sublabel": "/Users/growthgod/VAN",
+      "pos": [440, 130],
+      "size": [150, 64],
+      "tag": "runtime roots"
+    },
+    {
+      "id": "hermes",
+      "type": "backend",
+      "label": "Hermes Fleet",
+      "sublabel": "~/.hermes agents + sessions",
+      "pos": [660, 130],
+      "size": [150, 64]
+    },
+    {
+      "id": "lobehub",
+      "type": "frontend",
+      "label": "AzA Command Center",
+      "sublabel": "/Users/growthgod/lobehub",
+      "pos": [440, 350],
+      "size": [160, 70],
+      "tag": "operator UI"
+    },
+    {
+      "id": "aza",
+      "type": "database",
+      "label": "AzA Brain",
+      "sublabel": "Postgres + MCP target",
+      "pos": [680, 350],
+      "size": [150, 70],
+      "tag": "canonical"
+    },
+    {
+      "id": "brain",
+      "type": "database",
+      "label": "VANTA-Brain",
+      "sublabel": "Documents vault projection",
+      "pos": [900, 350],
+      "size": [160, 70]
+    },
+    {
+      "id": "contentApps",
+      "type": "external",
+      "label": "Content Apps",
+      "sublabel": "ChatGPT, Kimi, Gemini, MiniMax",
+      "pos": [220, 590],
+      "size": [160, 64]
+    },
+    {
+      "id": "browserApps",
+      "type": "frontend",
+      "label": "Browser / Web Apps",
+      "sublabel": "Chrome, Comet, Notion, Linear",
+      "pos": [440, 590],
+      "size": [170, 64]
+    },
+    {
+      "id": "deviceLane",
+      "type": "external",
+      "label": "Device Lane",
+      "sublabel": "DuoPlus, GeeLark, VMOS",
+      "pos": [680, 590],
+      "size": [160, 64]
+    },
+    {
+      "id": "sync",
+      "type": "messagebus",
+      "label": "Sync Jobs",
+      "sublabel": "LaunchAgents + scripts",
+      "pos": [900, 590],
+      "size": [150, 64],
+      "tag": "needs repair"
+    }
+  ],
+  "connections": [
+    {
+      "from": "architect",
+      "to": "codex",
+      "label": "requests + approvals",
+      "variant": "emphasis",
+      "labelAt": [185, 332]
+    },
+    {
+      "from": "codex",
+      "to": "lobehub",
+      "label": "executes code work",
+      "variant": "emphasis",
+      "labelAt": [405, 332]
+    },
+    {
+      "from": "lobehub",
+      "to": "aza",
+      "label": "approved read/write",
+      "variant": "security",
+      "labelAt": [640, 332]
+    },
+    {
+      "from": "aza",
+      "to": "brain",
+      "label": "curated projection",
+      "variant": "dashed",
+      "labelAt": [836, 332]
+    },
+    {
+      "from": "codexMemory",
+      "to": "aza",
+      "label": "rollout summaries",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "top",
+      "labelDy": -22
+    },
+    {
+      "from": "van",
+      "to": "aza",
+      "label": "repo docs + service evidence",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": -10
+    },
+    {
+      "from": "hermes",
+      "to": "aza",
+      "label": "agent memories",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": -34
+    },
+    {
+      "from": "contentApps",
+      "to": "codex",
+      "label": "outputs + evidence",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelDy": 22
+    },
+    {
+      "from": "browserApps",
+      "to": "lobehub",
+      "label": "operator context",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelDy": 24
+    },
+    {
+      "from": "deviceLane",
+      "to": "van",
+      "label": "device telemetry",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelAt": [620, 250]
+    },
+    {
+      "from": "sync",
+      "to": "brain",
+      "label": "nightly export lane",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelDy": 24
+    }
+  ],
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "VANTA / AzA Command Architecture",
+    "subtitle": "Current Mac organization, memory layers, command center, and content/app lanes",
+    "output": "vanta-aza-architecture.html",
+    "viewBox": [1180, 820]
+  },
+  "schema_version": 1
+}

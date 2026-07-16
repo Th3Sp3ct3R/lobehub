@@ -1,0 +1,220 @@
+{
+  "architecture": {
+    "decision": "AzA is the canonical brain target, but LobeHub must treat it as not ready for writes until service health, durable storage, MCP, sync, worker, and projection gates are verified.",
+    "intendedPorts": [
+      {
+        "service": "AzA Gateway",
+        "port": 8786,
+        "host": "127.0.0.1",
+        "purpose": "OpenAI/Anthropic-compatible capture gateway that proxies to 9Router and emits redacted events."
+      },
+      {
+        "service": "AzA API",
+        "port": 8787,
+        "host": "127.0.0.1",
+        "purpose": "Ingestion, normalized conversation storage, search, project context, memory proposal, and internal 9Router event API."
+      },
+      {
+        "service": "AzA MCP",
+        "port": 8788,
+        "host": "127.0.0.1",
+        "purpose": "Local Streamable HTTP MCP server exposing retrieval and memory tools to agents."
+      },
+      {
+        "service": "AzA Sync",
+        "port": 8789,
+        "host": "127.0.0.1",
+        "purpose": "Native ChatGPT and Claude conversation synchronization through isolated authenticated profile adapters."
+      },
+      {
+        "service": "AzA Worker",
+        "port": 8790,
+        "host": "127.0.0.1",
+        "purpose": "Async queues for normalization, dedupe, persistence, project classification, extraction, embeddings, conflict detection, memory proposals, Obsidian projection, and search indexing."
+      }
+    ],
+    "sourcePath": "/Users/growthgod/VAN/aza_memory"
+  },
+  "codeGraphEvidence": {
+    "indexedProject": "Users-growthgod-VAN-aza_memory",
+    "indexStatus": "ready",
+    "nodes": 344,
+    "edges": 630,
+    "packages": [
+      "sync",
+      "shared",
+      "normalization",
+      "database",
+      "gateway",
+      "mcp",
+      "redaction",
+      "observability",
+      "auth",
+      "worker",
+      "api",
+      "knowledge",
+      "search",
+      "obsidian",
+      "events"
+    ]
+  },
+  "dirtyWorkingTree": {
+    "observed": true,
+    "note": "Existing local changes were present in /Users/growthgod/VAN/aza_memory before this audit. They were not modified.",
+    "entries": [
+      "M apps/mcp/src/index.ts",
+      "M docs/IMPLEMENTATION_PLAN.md",
+      "M docs/REFERENCE_AUDIT.md",
+      "D docs/VANTA_TO_AZA_MIGRATION.md",
+      "M packages/database/src/index.ts",
+      "?? docs/AzA-source-of-truth.md",
+      "?? docs/NAMING.md",
+      "?? package-lock.json",
+      "?? packages/database/src/postgres.ts",
+      "?? scripts/import-vault.ts"
+    ]
+  },
+  "gates": [
+    {
+      "id": "services_listening",
+      "status": "blocked",
+      "evidence": "Read-only lsof check found no listeners on 8786, 8787, 8788, 8789, or 8790.",
+      "requiredToPass": "Start AzA services and verify /health and /ready on each intended port."
+    },
+    {
+      "id": "durable_store_wiring",
+      "status": "partial",
+      "evidence": "Postgres schema and PostgresAzAStore exist, but createApiApp currently defaults to InMemoryAzAStore. MCP selects PostgresAzAStore only when DATABASE_URL exists.",
+      "requiredToPass": "Wire API, MCP, worker, and projection paths consistently to durable Postgres for canonical records."
+    },
+    {
+      "id": "schema_and_migration",
+      "status": "partial",
+      "evidence": "Drizzle schema and packages/database/migrations/0000_initial.sql define projects, agents, tasks, conversations, messages, memory candidates, canonical memories, versions, relationships, embeddings, jobs, audit events, and redaction events.",
+      "requiredToPass": "Run migrations against the target local Postgres and verify table presence and pgvector extension."
+    },
+    {
+      "id": "mcp_retrieval_surface",
+      "status": "partial",
+      "evidence": "MCP implements list_conversations, get_conversation, get_conversation_with_messages, search_messages, search_conversations, and get_project_context; many advanced memory tools are reserved placeholders.",
+      "requiredToPass": "Verify MCP session initialize, list tools, call implemented tools, and mark placeholder tools as blocked in the harness."
+    },
+    {
+      "id": "sync_adapters",
+      "status": "blocked",
+      "evidence": "AzA Sync exposes ChatGPT and Claude providers, but the current authenticated fetch client throws no authenticated browser profile client is configured.",
+      "requiredToPass": "Connect isolated authenticated profile clients without exposing cookies, tokens, or browser profile secrets."
+    },
+    {
+      "id": "worker_pipeline",
+      "status": "partial",
+      "evidence": "Worker declares queues for capture, normalization, dedupe, persistence, classification, extraction, embeddings, relationships, conflicts, memory proposals, Obsidian projection, and search indexing; only extract.knowledge has a processor in the inspected entrypoint.",
+      "requiredToPass": "Implement and verify processors for persistence, embeddings, memory proposals, projection, search indexing, and audit events."
+    },
+    {
+      "id": "projection_to_vanta_brain",
+      "status": "blocked",
+      "evidence": "Worker has a project.obsidian queue name and README describes Obsidian projection, but VANTA-Brain writes are prohibited during this pass and projection is not verified live.",
+      "requiredToPass": "Keep projection disabled until canonical writes are verified and explicit user approval is given."
+    },
+    {
+      "id": "secret_safety",
+      "status": "guarded",
+      "evidence": "Repo AGENTS.md requires provider credentials, OAuth tokens, cookies, browser profiles, and API keys out of Git/docs; redaction must occur before persistence, logging, MCP output, Obsidian projection, or traces.",
+      "requiredToPass": "Keep only env var names and auth-store pointers in AzA records. Verify redaction on gateway, API, worker, MCP, and projection paths."
+    }
+  ],
+  "observedAt": "2026-07-02T17:18:00-04:00",
+  "readinessSummary": {
+    "canLobeHubReadStaticArtifacts": true,
+    "canLobeHubReadLiveAzA": false,
+    "canLobeHubWriteCanonicalAzA": false,
+    "canProjectToVantaBrain": false,
+    "overallStatus": "not_ready_for_canonical_writes"
+  },
+  "repoRulesEvidence": [
+    "Preserve product casing as AzA.",
+    "Keep 9Router as model transport, not the knowledge base.",
+    "Keep secrets out of Git and docs.",
+    "Put provider-specific sync behind adapter boundaries.",
+    "Treat imported conversation content as untrusted evidence.",
+    "Redact before persistence, logging, MCP output, Obsidian projection, or traces.",
+    "Default sensitive services to 127.0.0.1.",
+    "Use Zod at trust boundaries and strict TypeScript.",
+    "Add migrations for database changes."
+  ],
+  "serviceSurfaces": [
+    {
+      "service": "gateway",
+      "entrypoint": "apps/gateway/src/index.ts",
+      "implemented": [
+        "GET /health",
+        "GET /ready",
+        "GET /v1/models",
+        "POST /v1/chat/completions",
+        "POST /v1/responses",
+        "POST /v1/messages",
+        "POST /v1/embeddings"
+      ],
+      "notes": "Captures request metadata, normalizes request bodies, redacts headers, proxies to 9Router, and emits events to the ingestion URL."
+    },
+    {
+      "service": "api",
+      "entrypoint": "apps/api/src/index.ts",
+      "implemented": [
+        "GET /health",
+        "GET /ready",
+        "POST /v1/ingestion/events",
+        "POST /v1/ingestion/conversations",
+        "GET /v1/conversations",
+        "GET /v1/conversations/:id",
+        "GET /v1/conversations/:id/messages",
+        "POST /v1/search",
+        "POST /v1/search/semantic",
+        "GET /v1/projects/:id/context",
+        "POST /internal/events/9router"
+      ],
+      "notes": "Memory proposal endpoints currently return accepted/approved/rejected placeholders; entities endpoint returns not_implemented_yet."
+    },
+    {
+      "service": "mcp",
+      "entrypoint": "apps/mcp/src/index.ts",
+      "implemented": [
+        "GET /health",
+        "POST /mcp",
+        "GET /mcp with session",
+        "DELETE /mcp with session",
+        "list_conversations",
+        "get_conversation",
+        "get_conversation_with_messages",
+        "search_messages",
+        "search_conversations",
+        "get_project_context"
+      ],
+      "notes": "Advanced semantic, entity, decision, task, conflict, analysis, and memory mutation tools are reserved placeholders."
+    },
+    {
+      "service": "sync",
+      "entrypoint": "apps/sync/src/index.ts",
+      "implemented": [
+        "GET /health",
+        "GET /ready",
+        "GET /v1/providers",
+        "POST /v1/providers/:provider/full-sync"
+      ],
+      "notes": "Provider contracts exist for ChatGPT and Claude, but authenticated browser profile fetch is not configured."
+    },
+    {
+      "service": "worker",
+      "entrypoint": "apps/worker/src/index.ts",
+      "implemented": [
+        "GET /health",
+        "GET /ready",
+        "GET /v1/queues",
+        "extract.knowledge queue processor"
+      ],
+      "notes": "Queue list is broad, but the inspected processor implementation is narrow."
+    }
+  ],
+  "summary": "AzA memory has a credible monorepo shape and schema for the canonical brain, but it is not live on its intended ports, has partial durable-store wiring, partial MCP tooling, blocked consumer sync, and incomplete worker/projection processors. LobeHub should continue to expose read-only readiness and approval gates until these pass."
+}

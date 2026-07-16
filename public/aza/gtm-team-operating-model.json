@@ -1,0 +1,277 @@
+{
+  "firstBoards": [
+    {
+      "name": "Daily Command",
+      "records": ["daily_command_log", "task", "evidence"],
+      "view": "today by owner and blocked state"
+    },
+    {
+      "name": "GTM Pipeline",
+      "records": ["offer", "lead", "pilot", "proof"],
+      "view": "offer to lead to pilot to renewal"
+    },
+    {
+      "name": "Content Factory",
+      "records": ["content_campaign", "asset", "publish_event", "analytics_snapshot"],
+      "view": "campaign by asset status and app surface"
+    },
+    {
+      "name": "Memory Intake",
+      "records": ["source", "memory_record", "projection", "audit"],
+      "view": "source to canonical AzA record to VANTA-Brain projection"
+    }
+  ],
+  "lobeHubHarnessWorkflow": [
+    {
+      "step": "read",
+      "rule": "LobeHub presents the operator context. Codex inspects real paths, app state, source files, processes, and logs before proposing or editing."
+    },
+    {
+      "step": "route",
+      "rule": "Assign each item to a lane, owner, agent, target path, approval mode, and evidence requirement."
+    },
+    {
+      "step": "act",
+      "rule": "Perform scoped writes only after destination and rollback are clear. Keep restricted paths read-only unless approved."
+    },
+    {
+      "step": "verify",
+      "rule": "Run the narrowest useful command, browser check, health check, or artifact validation."
+    },
+    {
+      "step": "record",
+      "rule": "Attach evidence and update AzA records. Project only reviewed summaries to VANTA-Brain."
+    }
+  ],
+  "observedAt": "2026-07-02T16:45:00-04:00",
+  "operatingLanes": [
+    {
+      "id": "revenue",
+      "name": "Revenue and GTM",
+      "ownerRole": "Growth lead",
+      "objective": "Turn offers into leads, pilots, proof, renewals, and productized revenue.",
+      "records": ["offer", "segment", "lead", "outreach_touch", "pilot", "proof", "renewal"],
+      "cadence": "daily"
+    },
+    {
+      "id": "product",
+      "name": "Application development",
+      "ownerRole": "Engineering lead",
+      "objective": "Convert verified customer and operator needs into AzA, LobeHub, memory, and automation work.",
+      "records": ["problem", "feature", "task", "decision", "validation", "release_gate"],
+      "cadence": "daily"
+    },
+    {
+      "id": "content",
+      "name": "Content generation",
+      "ownerRole": "Content lead",
+      "objective": "Coordinate scripts, prompts, generated media, edits, publishing, and performance proof across apps.",
+      "records": ["campaign", "asset", "prompt", "draft", "publish_event", "analytics_snapshot"],
+      "cadence": "per campaign"
+    },
+    {
+      "id": "operations",
+      "name": "Agent and fleet operations",
+      "ownerRole": "Operations lead",
+      "objective": "Track agents, devices, browser sessions, approvals, task state, and evidence without leaking secrets.",
+      "records": ["agent", "skill", "session", "device", "approval", "evidence"],
+      "cadence": "per task"
+    },
+    {
+      "id": "knowledge",
+      "name": "Memory and knowledge operations",
+      "ownerRole": "Knowledge lead",
+      "objective": "Promote verified facts into canonical AzA memory and publish safe summaries to VANTA-Brain.",
+      "records": ["source", "memory_record", "projection", "conflict", "supersession", "audit"],
+      "cadence": "continuous"
+    }
+  ],
+  "privacyAndApproval": {
+    "blockedData": [
+      "raw credentials",
+      "API keys",
+      "OAuth tokens",
+      "cookies",
+      "private message bodies",
+      "customer credentials",
+      "unapproved browser tab contents"
+    ],
+    "approvalRequiredFor": [
+      "writes to /Users/growthgod/VAN",
+      "writes to /Users/growthgod/Documents/VANTA-Brain",
+      "posting or messaging from browser or device sessions",
+      "account-changing operations",
+      "credential rotation",
+      "publishing customer-facing content"
+    ],
+    "defaultMode": "read-only inventory and reviewed summaries"
+  },
+  "purpose": "Define the first AzA command-center data model for GTM, product development, content production, team ownership, and Codex execution inside the LobeHub harness.",
+  "recordTypes": {
+    "offer": {
+      "description": "A productized service or software offer being tested or sold.",
+      "requiredFields": [
+        "id",
+        "name",
+        "targetSegment",
+        "promise",
+        "price",
+        "proofRequired",
+        "deliveryScope",
+        "owner",
+        "status",
+        "evidenceIds"
+      ],
+      "status": ["draft", "testing", "active", "paused", "retired"]
+    },
+    "lead": {
+      "description": "A person, company, creator, agency, or local business in the GTM pipeline.",
+      "requiredFields": [
+        "id",
+        "source",
+        "segment",
+        "accountLabel",
+        "fitScore",
+        "offerId",
+        "lastTouchAt",
+        "nextAction",
+        "owner",
+        "status",
+        "evidenceIds"
+      ],
+      "status": [
+        "new",
+        "qualified",
+        "contacted",
+        "responded",
+        "pilot",
+        "won",
+        "lost",
+        "do_not_contact"
+      ]
+    },
+    "pilot": {
+      "description": "A paid or unpaid customer validation run with measurable outcomes.",
+      "requiredFields": [
+        "id",
+        "customerLabel",
+        "offerId",
+        "startDate",
+        "endDate",
+        "goal",
+        "baseline",
+        "deliverables",
+        "owner",
+        "risk",
+        "status",
+        "evidenceIds"
+      ],
+      "status": ["planned", "active", "blocked", "complete", "renewed", "churned"]
+    },
+    "content_campaign": {
+      "description": "A campaign that connects GTM goal, content assets, publishing surfaces, and performance proof.",
+      "requiredFields": [
+        "id",
+        "goal",
+        "audience",
+        "offerId",
+        "assetIds",
+        "sourceApps",
+        "publishTargets",
+        "owner",
+        "status",
+        "evidenceIds"
+      ],
+      "status": [
+        "planned",
+        "drafting",
+        "generating",
+        "review",
+        "scheduled",
+        "published",
+        "measured"
+      ]
+    },
+    "task": {
+      "description": "A work item owned by a human or software agent.",
+      "requiredFields": [
+        "id",
+        "title",
+        "lane",
+        "owner",
+        "agent",
+        "source",
+        "targetPath",
+        "approvalRequired",
+        "status",
+        "validationCommand",
+        "evidenceIds"
+      ],
+      "status": ["backlog", "ready", "in_progress", "blocked", "review", "done", "archived"]
+    },
+    "daily_command_log": {
+      "description": "The daily operator summary for LobeHub as the harness and Codex as the coding executor.",
+      "requiredFields": [
+        "date",
+        "shipped",
+        "sold",
+        "learned",
+        "blocked",
+        "nextActions",
+        "owner",
+        "evidenceIds"
+      ],
+      "status": ["open", "closed"]
+    },
+    "evidence": {
+      "description": "A proof object attached to a claim, task, decision, campaign, or memory record.",
+      "requiredFields": [
+        "id",
+        "type",
+        "sourcePath",
+        "capturedAt",
+        "summary",
+        "sensitivity",
+        "verifiedBy",
+        "retentionPolicy"
+      ],
+      "status": ["raw", "reviewed", "verified", "stale", "redacted"]
+    }
+  },
+  "roleMap": [
+    {
+      "name": "LobeHub",
+      "role": "harness",
+      "responsibility": "Owns the command surface, operator views, approvals, boards, and read/write intent flow."
+    },
+    {
+      "name": "Codex",
+      "role": "coding-agent",
+      "responsibility": "Executes codebase inspection, implementation, shell commands, validation, browser checks, and evidence capture."
+    },
+    {
+      "name": "AzA",
+      "role": "canonical-brain",
+      "responsibility": "Stores typed memory records, provenance, permissions, indexes, verification status, and projection history."
+    },
+    {
+      "name": "VANTA-Brain",
+      "role": "projection-vault",
+      "responsibility": "Receives reviewed markdown summaries and decision notes after canonical AzA records exist."
+    }
+  ],
+  "schemaVersion": "0.1.0",
+  "sourceOfTruth": {
+    "canonicalTarget": "AzA typed memory records",
+    "harness": "/Users/growthgod/lobehub",
+    "codingAgent": "/Users/growthgod/.codex",
+    "projectionVault": "/Users/growthgod/Documents/VANTA-Brain",
+    "runtimeRoots": [
+      "/Users/growthgod/VAN",
+      "/Users/growthgod/.codex",
+      "/Users/growthgod/.agents",
+      "/Users/growthgod/.hermes"
+    ],
+    "rule": "LobeHub is the operator harness. Codex is the coding agent that executes implementation, filesystem, terminal, and validation work inside that harness. Write durable records to AzA first, then project reviewed summaries to VANTA-Brain. Do not store raw credentials, private messages, cookies, or tokens."
+  }
+}

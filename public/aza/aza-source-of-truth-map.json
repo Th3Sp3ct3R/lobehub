@@ -1,0 +1,603 @@
+{
+  "adapterBuildSequence": [
+    {
+      "id": "artifact_catalog",
+      "status": "started",
+      "description": "Keep the static architecture, app, agent, service, GTM, contract, and content registry artifacts discoverable from LobeHub.",
+      "requires": ["public artifact links", "JSON parse checks", "browser render check"],
+      "writesAllowed": [
+        "/Users/growthgod/lobehub/public/aza",
+        "/Users/growthgod/lobehub/src/app/aza"
+      ]
+    },
+    {
+      "id": "service_health_adapter",
+      "status": "needed",
+      "description": "Turn the local service and port snapshot into a read-only health adapter with owner, cwd, health URL, and last-verified evidence.",
+      "requires": [
+        "known process owner",
+        "known repo path",
+        "health response",
+        "no secrets in command output"
+      ],
+      "writesAllowed": ["AzA canonical record only after API and schema are live"]
+    },
+    {
+      "id": "workspace_root_reconciliation_map",
+      "status": "modeled",
+      "description": "Reconcile LobeHub, VAN, AzA memory, VANTA-Brain, Desktop/VAN, Codex, Hermes, and agent skill roots with marker presence, branch names, listener counts, and ownership policy.",
+      "requires": [
+        "root path",
+        "expected owner",
+        "marker presence",
+        "git HEAD branch",
+        "listener count",
+        "write policy",
+        "reconciliation decision"
+      ],
+      "writesAllowed": [
+        "none; root reconciliation is read-only until a specific workspace write is approved"
+      ]
+    },
+    {
+      "id": "agent_skill_session_index",
+      "status": "needed",
+      "description": "Index Codex, Hermes, and agent skill roots as metadata first, with session summaries promoted only after sensitivity review.",
+      "requires": [
+        "agent root",
+        "skill root",
+        "session source",
+        "owner",
+        "sensitivity label",
+        "allowed readers"
+      ],
+      "writesAllowed": ["AzA canonical records after approval gates"]
+    },
+    {
+      "id": "agent_fleet_map",
+      "status": "modeled",
+      "description": "Expose Hermes agent definitions, skill roots, manifest presence, namespace routes, and agent categories as metadata-only fleet records.",
+      "requires": [
+        "source root",
+        "agent id",
+        "manifest signal",
+        "category",
+        "skill root",
+        "namespace route",
+        "session scope",
+        "write policy"
+      ],
+      "writesAllowed": [
+        "none; fleet map only until AzA agent, skill, session, and memory records are durable"
+      ]
+    },
+    {
+      "id": "vanta_brain_coverage_map",
+      "status": "modeled",
+      "description": "Compare VANTA-Brain projection folders against live Codex, Hermes, agent skill, session, memory, project, and documentation source roots using metadata-only scans.",
+      "requires": [
+        "projection root",
+        "folder and file metadata",
+        "source root ids",
+        "coverage target",
+        "matched projection signals",
+        "gap",
+        "next action"
+      ],
+      "writesAllowed": [
+        "none; VANTA-Brain coverage is read-only until canonical AzA records and projection approval exist"
+      ]
+    },
+    {
+      "id": "app_content_registry",
+      "status": "started",
+      "description": "Classify browser, Electron, voice, content, publishing, and device apps by role, output path, account label, and automation mode.",
+      "requires": [
+        "app metadata",
+        "content role",
+        "output path",
+        "automation mode",
+        "approval boundary"
+      ],
+      "writesAllowed": ["AzA app_surface and content_campaign records after schema validation"]
+    },
+    {
+      "id": "content_app_audit_map",
+      "status": "modeled",
+      "description": "Expose a privacy-safe live audit of which browser, Electron, voice, publishing, and device apps still need account labels, auth pointers, output paths, output kinds, and evidence before capture, publishing, measurement, or AzA asset records.",
+      "requires": [
+        "app metadata",
+        "account label",
+        "auth pointer",
+        "default export path",
+        "output kinds",
+        "evidence pointer",
+        "approval gate"
+      ],
+      "writesAllowed": [
+        "none; audit map only until app fields are reviewed and canonical API gates pass"
+      ]
+    },
+    {
+      "id": "access_capability_map",
+      "status": "modeled",
+      "description": "Explain what each logged-in browser, Electron, content, communication, coding, and device surface can safely do after login, while keeping actual login state and private contents out of scope.",
+      "requires": [
+        "app name",
+        "app category",
+        "automation mode",
+        "account label status",
+        "auth pointer status",
+        "output path status",
+        "evidence pointer status",
+        "capability class",
+        "blocked action labels"
+      ],
+      "writesAllowed": [
+        "none; capability map only until per-action approval, evidence, redaction, and canonical AzA write gates pass"
+      ]
+    },
+    {
+      "id": "gtm_team_boards",
+      "status": "modeled",
+      "description": "Create Daily Command, GTM Pipeline, Content Factory, Product Delivery, and Memory Intake boards from typed records.",
+      "requires": ["record type", "owner", "lane", "status", "next action", "evidence pointer"],
+      "writesAllowed": ["LobeHub board state and AzA records after canonical API is live"]
+    },
+    {
+      "id": "team_data_routing_map",
+      "status": "modeled",
+      "description": "Connect GTM, product, content, operations, and knowledge lanes to owner roles, record routes, handoffs, storage boundaries, evidence requirements, and current write blockers.",
+      "requires": [
+        "lane",
+        "owner role",
+        "record type",
+        "handoff",
+        "storage boundary",
+        "write gate",
+        "evidence"
+      ],
+      "writesAllowed": ["none; routing map only until durable AzA board and record writes pass"]
+    },
+    {
+      "id": "daily_command_workflow_map",
+      "status": "modeled",
+      "description": "Stitch operator intent, LobeHub routing, Codex execution, evidence capture, team lanes, memory promotion, content operations, and VANTA-Brain projection into one read-only daily command loop.",
+      "requires": [
+        "workflow stage",
+        "owner role",
+        "record types",
+        "approval class",
+        "blocker",
+        "evidence path",
+        "cadence",
+        "handoff"
+      ],
+      "writesAllowed": [
+        "none; workflow map only until durable LobeHub-to-Codex handoff and AzA record writes pass"
+      ]
+    },
+    {
+      "id": "command_record_schema",
+      "status": "modeled",
+      "description": "Define the typed records needed for durable LobeHub-to-Codex handoff, approval decisions, execution runs, evidence receipts, GTM work, content operations, memory promotion, and projection requests.",
+      "requires": [
+        "record type",
+        "required fields",
+        "owner",
+        "allowed readers",
+        "sensitivity",
+        "write gate",
+        "evidence pointer"
+      ],
+      "writesAllowed": ["none; schema map only until canonical API, store, and write gates pass"]
+    },
+    {
+      "id": "communication_protocol_map",
+      "status": "modeled",
+      "description": "Map how the operator, LobeHub, Codex, VAN, AzA API, MCP, Postgres, agent runtimes, content apps, local services, and VANTA-Brain exchange information and which gates currently block each channel.",
+      "requires": [
+        "source layer",
+        "target layer",
+        "transport",
+        "approval mode",
+        "status",
+        "blockers",
+        "evidence"
+      ],
+      "writesAllowed": ["none; protocol map only until live channels and write gates pass"]
+    },
+    {
+      "id": "memory_intake_funnel",
+      "status": "modeled",
+      "description": "Map how granular Codex, Hermes, agent skill, project, app, GTM, and projection sources feed the unified AzA brain through metadata-only intake, access review, evidence, canonical write, MCP retrieval, and projection gates.",
+      "requires": [
+        "source category",
+        "namespace",
+        "record type",
+        "access profile",
+        "approval status",
+        "evidence",
+        "blocked write path"
+      ],
+      "writesAllowed": ["none; funnel map only until canonical API, store, and write gates pass"]
+    },
+    {
+      "id": "canonical_aza_write_api",
+      "status": "blocked",
+      "description": "Allow approved writes only through AzA API or MCP, with typed records, provenance, permissions, and verification status.",
+      "requires": ["AzA health route", "schema validation", "redaction", "rollback", "evidence"],
+      "writesAllowed": ["AzA database and indexes only after live validation"]
+    },
+    {
+      "id": "aza_verification_runbook",
+      "status": "modeled",
+      "description": "Turn the remaining AzA live-service, Postgres, pgvector, MCP, API/MCP shared-store, LobeHub adapter, and VANTA-Brain projection blockers into exact probe steps and approval-required command previews.",
+      "requires": [
+        "service contract",
+        "health URL",
+        "ready URL",
+        "command preview",
+        "approval class",
+        "expected evidence",
+        "blocker",
+        "write boundary"
+      ],
+      "writesAllowed": [
+        "none; runbook is read-only and only describes commands that require separate approval"
+      ]
+    },
+    {
+      "id": "vanta_brain_projection_worker",
+      "status": "blocked",
+      "description": "Project reviewed markdown summaries from AzA to VANTA-Brain after canonical records exist and the user approves the projection.",
+      "requires": [
+        "canonical AzA id",
+        "projection template",
+        "redaction pass",
+        "explicit approval"
+      ],
+      "writesAllowed": ["none during this pass"]
+    },
+    {
+      "id": "browser_device_action_adapter",
+      "status": "blocked",
+      "description": "Permit browser or device actions only after read-only state capture, target account labels, explicit action approval, and evidence logging.",
+      "requires": [
+        "target app",
+        "target account label",
+        "action class",
+        "risk label",
+        "human approval",
+        "evidence path"
+      ],
+      "writesAllowed": ["draft-only until explicit action approval"]
+    }
+  ],
+  "artifactCatalog": [
+    {
+      "artifact": "/aza/aza-pc-architecture.html",
+      "purpose": "Interactive Archify diagram for the current PC command architecture, including LobeHub harness, Codex executor, VAN runtime, agent overlays, AzA canonical target, content apps, GTM lanes, local services, and VANTA-Brain projection."
+    },
+    {
+      "artifact": "/aza/aza-pc-architecture.architecture.json",
+      "purpose": "Source JSON for regenerating the PC command architecture diagram."
+    },
+    {
+      "artifact": "/aza/aza-pc-architecture.png",
+      "purpose": "Static preview image for the PC command architecture diagram."
+    },
+    {
+      "artifact": "/aza/vanta-aza-architecture.html",
+      "purpose": "Interactive Archify architecture diagram."
+    },
+    {
+      "artifact": "/aza/vanta-aza-architecture.architecture.json",
+      "purpose": "Source JSON for the architecture diagram."
+    },
+    {
+      "artifact": "/aza/app-surface-inventory.json",
+      "purpose": "Privacy-safe app inventory from Computer Use."
+    },
+    {
+      "artifact": "/aza/content-generation-app-registry.json",
+      "purpose": "Content production app roles, stages, modes, fields, and write-back plan."
+    },
+    {
+      "artifact": "/aza/vanta-brain-readonly-audit.json",
+      "purpose": "Read-only VANTA-Brain coverage and sync audit."
+    },
+    {
+      "artifact": "/aza/live-vanta-brain-coverage",
+      "purpose": "Dynamic read-only route that compares VANTA-Brain projection folders against source roots for documentation, agents, skills, sessions, memories, and projects using metadata only."
+    },
+    {
+      "artifact": "/aza/gtm-team-operating-model.json",
+      "purpose": "GTM lanes, boards, record types, and LobeHub harness workflow."
+    },
+    {
+      "artifact": "/aza/agent-memory-skill-inventory.json",
+      "purpose": "Agent, skill, session, and memory roots for AzA indexing."
+    },
+    {
+      "artifact": "/aza/live-agent-fleet-map",
+      "purpose": "Dynamic read-only route that inventories Hermes agents, skill roots, manifest presence, namespace routes, and agent categories without reading raw agent files, skill bodies, sessions, or memories."
+    },
+    {
+      "artifact": "/aza/van-project-root-inventory.json",
+      "purpose": "Safe top-level inventory of the active VAN workspace."
+    },
+    {
+      "artifact": "/aza/local-service-port-inventory.json",
+      "purpose": "Live local listener snapshot and AzA port gaps."
+    },
+    {
+      "artifact": "/aza/aza-brain-readiness-audit.json",
+      "purpose": "Read-only audit of the actual AzA memory repo, service surfaces, live-port state, durable-store gaps, and canonical-write gates."
+    },
+    {
+      "artifact": "/aza/aza-goal-completion-audit.json",
+      "purpose": "Requirement-by-requirement audit for the original objective, including proven items, partial items, live blockers, and next proof gates."
+    },
+    {
+      "artifact": "/aza/live-readiness",
+      "purpose": "Dynamic read-only route that checks command-center artifacts and AzA localhost service health."
+    },
+    {
+      "artifact": "/aza/live-canonical-store",
+      "purpose": "Dynamic read-only route that checks canonical-store prerequisites, required environment presence, supported database driver, and proof tasks without exposing secrets, connecting to the database, running migrations, or reading database contents."
+    },
+    {
+      "artifact": "/aza/live-codex-harness",
+      "purpose": "Dynamic read-only route that maps the LobeHub harness, Codex executor, task/runtime primitives, approval lanes, and evidence handoff without creating tasks, invoking Codex, running commands, reading task contents, or writing records."
+    },
+    {
+      "artifact": "/aza/live-command-record-schema",
+      "purpose": "Dynamic read-only route that defines command, approval, Codex run, evidence, GTM, content, memory promotion, and projection schemas without creating records, invoking Codex, reading database contents, or writing files."
+    },
+    {
+      "artifact": "/aza/live-communication-protocols",
+      "purpose": "Dynamic read-only route that maps how operator intent, LobeHub, Codex, VAN, AzA API, MCP, Postgres, agent runtimes, content apps, local services, and VANTA-Brain communicate without reading private data or writing records."
+    },
+    {
+      "artifact": "/aza/live-memory-intake-funnel",
+      "purpose": "Dynamic read-only route that maps how granular agent, session, project, app, GTM, and projection sources feed the unified AzA brain through approval and evidence gates without reading raw contents or writing records."
+    },
+    {
+      "artifact": "/aza/live-operating-board",
+      "purpose": "Dynamic read-only route that derives operating board cards from GTM, completion-audit, content-registry, and live-readiness evidence."
+    },
+    {
+      "artifact": "/aza/live-app-map",
+      "purpose": "Dynamic read-only route that inventories installed app bundles, safe bundle identifiers, bundle versions, source roots, Chrome/webapp wrappers, visible desktop apps, content roles, stages, and automation modes without reading windows, tabs, documents, messages, cookies, tokens, or login state."
+    },
+    {
+      "artifact": "/aza/live-gtm-map",
+      "purpose": "Dynamic read-only route that derives GTM lanes, team ownership, record schemas, approval boundaries, and operating-board status from current command-center artifacts."
+    },
+    {
+      "artifact": "/aza/live-team-data-routing",
+      "purpose": "Dynamic read-only route that maps team lanes, record routes, handoffs, storage boundaries, owner roles, and blockers for GTM, product, content, operations, and knowledge data."
+    },
+    {
+      "artifact": "/aza/live-daily-command-workflow",
+      "purpose": "Dynamic read-only route that maps how operator intent moves through LobeHub, Codex execution, team cadences, evidence, memory promotion, content operations, and projection gates."
+    },
+    {
+      "artifact": "/aza/live-command-gates",
+      "purpose": "Dynamic read-only route that combines all live maps into explicit read gates, blocked writes, approval-required actions, and next proof steps before any canonical write."
+    },
+    {
+      "artifact": "/aza/live-implementation-proof",
+      "purpose": "Dynamic read-only route that turns current blockers into ordered proof gates before canonical writes, durable boards, MCP-backed reads, or VANTA-Brain projection without starting services, running migrations, reading database contents, or writing files."
+    },
+    {
+      "artifact": "/aza/live-aza-verification-runbook",
+      "purpose": "Dynamic read-only route that lists exact AzA service contracts, health/ready probes, approval-required VAN command previews, Postgres/pgvector proof, MCP tool proof, shared-store proof, and expected evidence without executing commands or reading protected data."
+    },
+    {
+      "artifact": "/aza/live-mcp-tooling-map",
+      "purpose": "Dynamic read-only route that catalogs MCP client config presence, safe server names, AzA MCP implemented and placeholder tools, communication channels, and proof gates without exposing command strings, command arguments, env values, tokens, cookies, passwords, database contents, or tool payloads."
+    },
+    {
+      "artifact": "/aza/live-brain-topology",
+      "purpose": "Dynamic read-only route that models the hybrid AzA brain, granular agent/session namespaces, access profiles, and promotion pipeline without reading raw memories, sessions, skill bodies, or secrets."
+    },
+    {
+      "artifact": "/aza/live-agent-access-matrix",
+      "purpose": "Dynamic read-only route that maps agents and runtime roles to readable namespaces, writable lanes, session scopes, and approval requirements without reading raw memories, sessions, skill bodies, browser tabs, private messages, or secrets."
+    },
+    {
+      "artifact": "/aza/live-content-ops",
+      "purpose": "Dynamic read-only route that maps content apps into production stages, approval queues, registry gaps, and future AzA write-back records without reading app windows, browser tabs, documents, messages, generated media contents, or secrets."
+    },
+    {
+      "artifact": "/aza/live-content-app-audit",
+      "purpose": "Dynamic read-only route that shows which content-generation apps still need account labels, auth pointers, output paths, output kinds, evidence pointers, and approval gates before capture or publishing."
+    },
+    {
+      "artifact": "/aza/live-access-capability-map",
+      "purpose": "Dynamic read-only route that explains what browser, Electron, content, communication, coding, and device apps can safely do after login, and what remains audit-required, approval-required, or blocked without reading private app or browser contents."
+    },
+    {
+      "artifact": "/aza/live-ownership-resolution",
+      "purpose": "Dynamic read-only route that resolves source-of-truth ownership, ambiguous roots, write lanes, and approval policies without reading file contents, raw memories, sessions, browser tabs, private messages, customer credentials, or secrets."
+    },
+    {
+      "artifact": "/aza/live-project-map",
+      "purpose": "Dynamic read-only route that refreshes VAN, LobeHub, and Desktop/VAN top-level project roots, broad categories, and safe marker existence without reading file contents, env files, or git remotes."
+    },
+    {
+      "artifact": "/aza/live-workspace-root-reconciliation",
+      "purpose": "Dynamic read-only route that reconciles LobeHub, VAN, AzA memory, VANTA-Brain, Desktop/VAN, Codex, Hermes, and agent skill roots with markers, branch names, listener counts, and ownership policy."
+    },
+    {
+      "artifact": "/aza/live-architecture-data-flow",
+      "purpose": "Dynamic read-only route that maps the PC command architecture as nodes, edges, gates, payload classes, approval rules, blockers, and evidence routes across the operator, LobeHub harness, Codex executor, VAN, agent runtimes, AzA canonical target, GTM/team lanes, content apps, local services, and VANTA-Brain."
+    },
+    {
+      "artifact": "/aza/live-aza-implementation",
+      "purpose": "Dynamic read-only route that inventories /Users/growthgod/VAN/aza_memory implementation metadata, service entrypoints, listener state, package scripts, env variable names, database table names, compose service names, healthcheck service names, localhost port bindings, migration metadata, migration table statement names, API capability labels, and MCP tool names without exposing raw source, raw compose contents, raw migration SQL, env values, secrets, database contents, or conversations."
+    },
+    {
+      "artifact": "/aza/live-memory-map",
+      "purpose": "Dynamic read-only route that counts Codex, Hermes, agent skill, session, memory, and VANTA-Brain projection roots without reading raw skill bodies, memories, sessions, or secrets."
+    },
+    {
+      "artifact": "/aza/live-service-map",
+      "purpose": "Dynamic read-only route that inventories current TCP listeners, expected services, process cwd ownership, VAN and Desktop/VAN runtime ownership, and unknown local listeners without reading secrets or command arguments."
+    },
+    {
+      "artifact": "/aza/live-system-map",
+      "purpose": "Dynamic read-only route that combines root checks, service readiness, board state, app inventory, memory ownership, and communication edges into one machine-readable map."
+    },
+    {
+      "artifact": "/aza/live-goal-completion-audit",
+      "purpose": "Dynamic read-only route that derives requirement-by-requirement completion status for the active AzA architecture goal from current live map summaries without reading raw private contents or writing records."
+    },
+    {
+      "artifact": "/aza/live-execution-sequence",
+      "purpose": "Dynamic read-only route that orders the next approval, service, store, MCP, adapter, content, GTM, and projection steps required to move from read-only command center to live AzA brain without executing them."
+    },
+    {
+      "artifact": "/aza/live-approval-packet",
+      "purpose": "Dynamic read-only route that turns approval-gated runtime, content app, and projection blockers into exact approval text, boundaries, command classes, evidence rules, rollback labels, and command previews without executing them."
+    },
+    {
+      "artifact": "/aza/live-delivery-roadmap",
+      "purpose": "Dynamic read-only route that composes operating board, GTM, team data, implementation proof, and approval packet evidence into build milestones and workstreams for command center, runtime verification, canonical brain, LobeHub adapters, durable boards, GTM, content operations, and projection."
+    },
+    {
+      "artifact": "/aza/live-browser-task-tooling-map",
+      "purpose": "Dynamic read-only route that recommends Browser Plugin, Computer Use, Chrome CDP/Electron RPC, MCP, and Codex routing by task class while preserving AzA as the durable source of truth for memory."
+    },
+    {
+      "artifact": "/aza/live-tooling-recommendation-plan",
+      "purpose": "Dynamic read-only route that turns the Browser Plugin, MCP, Codex, canonical AzA memory, and VANTA-Brain projection recommendation into an ordered operator plan."
+    },
+    {
+      "artifact": "/aza/aza-read-write-contract.json",
+      "purpose": "Read/write rules, blocked writes, harness roles, and approval gates."
+    }
+  ],
+  "completionGaps": [
+    {
+      "gap": "AzA API and MCP are not verified live",
+      "evidence": "Planned ports 8786-8790 were not listening in the local service inventory.",
+      "impact": "LobeHub must stay read-only for canonical memory writes."
+    },
+    {
+      "gap": "VANTA-Brain is not proven complete",
+      "evidence": "Read-only audit and /aza/live-vanta-brain-coverage show projection structure for docs, agents, sessions, memories, and projects, but complete canonical logging and dedicated skill projection are not proven.",
+      "impact": "Treat VANTA-Brain as a projection vault, not the raw source of truth or a guaranteed complete memory log."
+    },
+    {
+      "gap": "VAN has uncategorized project roots",
+      "evidence": "VAN inventory found 30 workspace or uncategorized top-level directories.",
+      "impact": "Routing and archive decisions need owner, status, and safety classification."
+    },
+    {
+      "gap": "Legacy Desktop/VAN runtime still exists",
+      "evidence": "Local service inventory found a Python service on port 7001 from /Users/growthgod/Desktop/VAN/odysseus.",
+      "impact": "The actual runtime graph still includes an older Desktop/VAN path that needs reconciliation."
+    },
+    {
+      "gap": "Browser and app login state is not audited",
+      "evidence": "Computer Use inventory listed running apps but intentionally excluded tabs, messages, documents, cookies, tokens, and raw login state.",
+      "impact": "Webapp and Electron automation stays read-only, draft-only, or approval-first."
+    },
+    {
+      "gap": "Dynamic adapters are minimal",
+      "evidence": "The command center has read-only /aza/live-readiness, /aza/live-canonical-store, /aza/live-codex-harness, /aza/live-command-record-schema, /aza/live-communication-protocols, /aza/live-architecture-data-flow, /aza/live-aza-implementation, /aza/live-aza-verification-runbook, /aza/live-mcp-tooling-map, /aza/live-browser-task-tooling-map, /aza/live-tooling-recommendation-plan, /aza/live-memory-intake-funnel, /aza/live-vanta-brain-coverage, /aza/live-app-map, /aza/live-gtm-map, /aza/live-team-data-routing, /aza/live-daily-command-workflow, /aza/live-execution-sequence, /aza/live-approval-packet, /aza/live-delivery-roadmap, /aza/live-command-gates, /aza/live-implementation-proof, /aza/live-brain-topology, /aza/live-agent-access-matrix, /aza/live-agent-fleet-map, /aza/live-content-ops, /aza/live-content-app-audit, /aza/live-access-capability-map, /aza/live-ownership-resolution, /aza/live-project-map, /aza/live-workspace-root-reconciliation, /aza/live-memory-map, /aza/live-service-map, /aza/live-operating-board, /aza/live-system-map, and /aza/live-goal-completion-audit routes, but canonical memory records and app registry state are still static or derived.",
+      "impact": "The page can explain architecture, probe basic health, check canonical-store prerequisites without exposing secrets, reconcile workspace roots and ownership boundaries, map LobeHub-to-Codex harness lanes and approval contracts, define command/evidence/approval record schemas, map communication protocols and current blockers, render the PC architecture as node/edge/gate data flow, inventory the AzA implementation repo, compose topology, and migration metadata as safe metadata, turn the remaining AzA service/MCP/Postgres blockers into exact verification runbook steps, convert approval-gated runtime/content/projection blockers into an explicit approval packet, show the metadata-only memory intake funnel from granular sources into unified AzA, compare VANTA-Brain projection coverage against source roots, inventory app surfaces, audit missing content app account/output/evidence fields, explain safe post-login capability classes without reading login contents, route team lanes to typed records and storage boundaries, show the daily command workflow from operator intent through Codex, evidence, memory, and projection gates, expose agent definitions and skill roots as metadata-only namespace routes, organize GTM/team schemas, show command write gates, expose implementation proof gates, model brain namespaces and access profiles, map agent/runtime access permissions, map content apps into production operations, resolve source-of-truth ownership and write lanes, inventory project roots, inventory memory roots, inventory actual listeners, derive an operating board, and expose a machine-readable system map now, but live memory retrieval, durable board state, write workflows, and projection still need API adapters and verification."
+    }
+  ],
+  "memoryArchitectureDecision": {
+    "decision": "hybrid_unified_brain_with_granular_agent_overlays",
+    "summary": "Use AzA as the single canonical brain for durable records, provenance, access control, search, and projection history. Keep granular per-agent skills, prompts, tools, sessions, and working memory in Codex, Hermes, and agent runtimes. Promote durable facts back into AzA with source, agent, session, sensitivity, and evidence labels.",
+    "whyNotSingleFlatVault": "A single flat vault would blur permissions, stale runtime state, raw logs, and secrets. It would also make it hard to tell which agent produced which fact.",
+    "whyNotFullySeparateBrains": "Fully separate agent brains would fragment GTM, product, architecture, and customer knowledge. Cross-agent routing needs one canonical memory graph."
+  },
+  "observedAt": "2026-07-02T17:10:00-04:00",
+  "sourceTruth": [
+    {
+      "path": "/Users/growthgod/lobehub",
+      "layer": "harness_command_surface",
+      "owns": [
+        "AzA command UI",
+        "approval display",
+        "operator boards",
+        "artifact catalog",
+        "command context"
+      ],
+      "writePolicy": "Allowed for scoped command-center implementation after organization is explained."
+    },
+    {
+      "path": "/Users/growthgod/VAN",
+      "layer": "active_runtime_workspace",
+      "owns": [
+        "product repos",
+        "agent repos",
+        "AzA implementation",
+        "device adapters",
+        "service code"
+      ],
+      "writePolicy": "Do not write without explicit target, reason, rollback, and approval."
+    },
+    {
+      "path": "/Users/growthgod/VAN/aza_memory",
+      "layer": "canonical_brain_target",
+      "owns": ["typed memory records", "search indexes", "MCP access", "projection pipeline"],
+      "writePolicy": "Blocked until API, MCP, schema, health, and validation are live."
+    },
+    {
+      "path": "/Users/growthgod/Documents/VANTA-Brain",
+      "layer": "human_readable_projection_vault",
+      "owns": [
+        "reviewed markdown summaries",
+        "decisions",
+        "human-readable indexes",
+        "safe documentation"
+      ],
+      "writePolicy": "Read-only during this pass."
+    },
+    {
+      "path": "/Users/growthgod/.codex",
+      "layer": "codex_executor_state",
+      "owns": [
+        "Codex goals",
+        "skills",
+        "plugins",
+        "worktrees",
+        "rollout summaries",
+        "execution traces"
+      ],
+      "writePolicy": "Runtime-native; promote only reviewed durable facts to AzA."
+    },
+    {
+      "path": "/Users/growthgod/.agents/skills",
+      "layer": "agent_skill_library",
+      "owns": ["agent skill definitions", "tooling instructions", "capability entrypoints"],
+      "writePolicy": "Index metadata first. Do not copy all bodies into global memory blindly."
+    },
+    {
+      "path": "/Users/growthgod/.hermes",
+      "layer": "agent_runtime",
+      "owns": ["Hermes agents", "skills", "sessions", "kanban", "runtime memories", "logs"],
+      "writePolicy": "Runtime-native. Promote summaries, decisions, and verified facts to AzA."
+    },
+    {
+      "path": "/Applications and browser/Electron surfaces",
+      "layer": "app_and_content_surface",
+      "owns": [
+        "generation apps",
+        "publishing apps",
+        "voice tools",
+        "browser sessions",
+        "device tools"
+      ],
+      "writePolicy": "Read-only, draft-only, reviewed-capture, approval-first, or blocked depending on risk."
+    }
+  ],
+  "summary": "This map consolidates the current PC architecture into one source-of-truth plan: LobeHub is the harness, Codex is the coding executor, VAN is the active runtime workspace, AzA is the canonical brain target, VANTA-Brain is a reviewed projection vault with partial live coverage evidence, workspace roots are reconciled by metadata and ownership policy, the agent fleet is metadata-mapped into granular overlays, the daily command workflow is read-only/manual until durable AzA gates pass, and app/device/browser surfaces remain approval-first until live adapters and approvals are implemented."
+}

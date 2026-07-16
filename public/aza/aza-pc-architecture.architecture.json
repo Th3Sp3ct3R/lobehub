@@ -1,0 +1,447 @@
+{
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Command surface",
+      "wraps": ["operator", "lobehub", "codex"]
+    },
+    {
+      "kind": "region",
+      "label": "Runtime and project workspace",
+      "wraps": ["van", "services"]
+    },
+    {
+      "kind": "region",
+      "label": "Granular agent overlays",
+      "wraps": ["codex_memory", "hermes", "skills", "gtm"]
+    },
+    {
+      "kind": "security-group",
+      "label": "AzA canonical brain target",
+      "wraps": ["aza_gateway", "aza_api", "aza_mcp", "handoff_records", "store"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Browser and content operating sessions",
+      "wraps": ["content_apps", "browser_sessions", "cdp", "device_cloud"]
+    },
+    {
+      "kind": "region",
+      "label": "Projection layer",
+      "wraps": ["vanta_brain"]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Command",
+      "items": [
+        "LobeHub is the harness",
+        "Codex executes implementation and checks",
+        "VAN and LobeHub writes remain approval-scoped"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Memory Rule",
+      "items": [
+        "Use one canonical AzA brain",
+        "Keep granular agent/session overlays local",
+        "Promote only verified, labeled records"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Live Proof",
+      "items": [
+        "Postgres + pgvector store passed",
+        "API/MCP shared record passed",
+        "Codex handoff + evidence records passed"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Remaining Blockers",
+      "items": [
+        "Native LobeHub task/approval adapter not wired",
+        "VANTA-Brain projection and direct scan blocked",
+        "Browser capture remains approval-first"
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "operator",
+      "type": "external",
+      "label": "Operator",
+      "sublabel": "intent + approvals",
+      "pos": [45, 370],
+      "size": [138, 64]
+    },
+    {
+      "id": "lobehub",
+      "type": "frontend",
+      "label": "LobeHub",
+      "sublabel": "AzA command harness",
+      "pos": [245, 370],
+      "size": [158, 64],
+      "tag": "active :3010"
+    },
+    {
+      "id": "codex",
+      "type": "backend",
+      "label": "Codex",
+      "sublabel": "coding executor",
+      "pos": [465, 370],
+      "size": [150, 64],
+      "tag": "manual active"
+    },
+    {
+      "id": "van",
+      "type": "cloud",
+      "label": "VAN",
+      "sublabel": "project runtime root",
+      "pos": [675, 370],
+      "size": [150, 64],
+      "tag": "write gated"
+    },
+    {
+      "id": "aza_gateway",
+      "type": "backend",
+      "label": "AzA Gateway",
+      "sublabel": "capture proxy :8786",
+      "pos": [890, 255],
+      "size": [154, 60],
+      "tag": "live"
+    },
+    {
+      "id": "aza_api",
+      "type": "backend",
+      "label": "AzA API",
+      "sublabel": "records API :8787",
+      "pos": [890, 370],
+      "size": [154, 60],
+      "tag": "live"
+    },
+    {
+      "id": "aza_mcp",
+      "type": "backend",
+      "label": "AzA MCP",
+      "sublabel": "retrieval :8788",
+      "pos": [890, 485],
+      "size": [154, 60],
+      "tag": "6/6 tools"
+    },
+    {
+      "id": "handoff_records",
+      "type": "messagebus",
+      "label": "Handoff + Evidence",
+      "sublabel": "Codex queue records",
+      "pos": [1115, 255],
+      "size": [170, 60],
+      "tag": "passed"
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Canonical Store",
+      "sublabel": "Postgres + pgvector :55432",
+      "pos": [1115, 370],
+      "size": [170, 64],
+      "tag": "durable live"
+    },
+    {
+      "id": "vanta_brain",
+      "type": "database",
+      "label": "VANTA-Brain",
+      "sublabel": "read-only projection vault",
+      "pos": [1325, 370],
+      "size": [160, 64],
+      "tag": "projection blocked"
+    },
+    {
+      "id": "codex_memory",
+      "type": "messagebus",
+      "label": "Codex State",
+      "sublabel": "~/.codex memories",
+      "pos": [465, 145],
+      "size": [150, 64],
+      "tag": "local evidence"
+    },
+    {
+      "id": "hermes",
+      "type": "messagebus",
+      "label": "Hermes Fleet",
+      "sublabel": "~/.hermes agents",
+      "pos": [675, 145],
+      "size": [150, 64],
+      "tag": "runtime overlay"
+    },
+    {
+      "id": "skills",
+      "type": "messagebus",
+      "label": "Skill Roots",
+      "sublabel": "~/.agents + ~/.codex",
+      "pos": [890, 145],
+      "size": [154, 64],
+      "tag": "metadata first"
+    },
+    {
+      "id": "gtm",
+      "type": "frontend",
+      "label": "GTM Board",
+      "sublabel": "offers + team lanes",
+      "pos": [1115, 145],
+      "size": [170, 64],
+      "tag": "board proven"
+    },
+    {
+      "id": "services",
+      "type": "cloud",
+      "label": "Local Services",
+      "sublabel": "ports + processes",
+      "pos": [245, 610],
+      "size": [158, 64],
+      "tag": "read-only map"
+    },
+    {
+      "id": "content_apps",
+      "type": "external",
+      "label": "Content Apps",
+      "sublabel": "web + Electron tools",
+      "pos": [465, 610],
+      "size": [150, 64],
+      "tag": "registry"
+    },
+    {
+      "id": "browser_sessions",
+      "type": "external",
+      "label": "Browser Sessions",
+      "sublabel": "manual logged-in IO",
+      "pos": [675, 610],
+      "size": [150, 64],
+      "tag": "planned IO"
+    },
+    {
+      "id": "cdp",
+      "type": "security",
+      "label": "CDP / Computer Use",
+      "sublabel": "automation bridge",
+      "pos": [890, 610],
+      "size": [154, 64],
+      "tag": "approval gate"
+    },
+    {
+      "id": "device_cloud",
+      "type": "external",
+      "label": "Device Cloud",
+      "sublabel": "DuoPlus / GeeLark / VMOS",
+      "pos": [1115, 610],
+      "size": [170, 64],
+      "tag": "approval only"
+    }
+  ],
+  "connections": [
+    {
+      "from": "operator",
+      "to": "lobehub",
+      "label": "intent",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "from": "lobehub",
+      "to": "codex",
+      "label": "execute",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "from": "codex",
+      "to": "handoff_records",
+      "label": "handoff + evidence",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "route": "orthogonal-h",
+      "labelAt": [760, 300]
+    },
+    {
+      "from": "codex",
+      "to": "van",
+      "label": "approved edits",
+      "variant": "security",
+      "route": "straight",
+      "labelAt": [640, 345]
+    },
+    {
+      "from": "van",
+      "to": "aza_gateway",
+      "label": "capture",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "route": "orthogonal-h",
+      "labelDy": -74
+    },
+    {
+      "from": "van",
+      "to": "aza_api",
+      "label": "records",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "route": "orthogonal-h"
+    },
+    {
+      "from": "van",
+      "to": "aza_mcp",
+      "label": "retrieval",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "route": "orthogonal-h",
+      "labelDy": 76
+    },
+    {
+      "from": "aza_gateway",
+      "to": "handoff_records",
+      "label": "normalized events",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "left",
+      "route": "orthogonal-h",
+      "labelDy": -52
+    },
+    {
+      "from": "handoff_records",
+      "to": "store",
+      "label": "durable proof",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "orthogonal-v"
+    },
+    {
+      "from": "aza_api",
+      "to": "store",
+      "label": "typed records",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "left",
+      "route": "orthogonal-h"
+    },
+    {
+      "from": "aza_mcp",
+      "to": "store",
+      "label": "search/index",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "route": "orthogonal-h",
+      "labelDy": 54
+    },
+    {
+      "from": "store",
+      "to": "vanta_brain",
+      "label": "reviewed projection",
+      "variant": "security",
+      "route": "straight",
+      "labelDy": -34
+    },
+    {
+      "from": "codex_memory",
+      "to": "store",
+      "label": "promote verified facts",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "top",
+      "route": "orthogonal-h",
+      "labelAt": [1030, 130]
+    },
+    {
+      "from": "hermes",
+      "to": "store",
+      "label": "agent/session summaries",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "top",
+      "route": "orthogonal-h",
+      "labelAt": [1070, 110]
+    },
+    {
+      "from": "skills",
+      "to": "store",
+      "label": "skill metadata",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "top",
+      "route": "orthogonal-h",
+      "labelAt": [1055, 230]
+    },
+    {
+      "from": "gtm",
+      "to": "store",
+      "label": "offers, leads, tasks",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "orthogonal-v",
+      "labelAt": [1310, 225]
+    },
+    {
+      "from": "services",
+      "to": "lobehub",
+      "label": "health maps",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "route": "orthogonal-v",
+      "labelDy": 45
+    },
+    {
+      "from": "content_apps",
+      "to": "store",
+      "label": "asset records",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "route": "orthogonal-h",
+      "labelAt": [820, 740]
+    },
+    {
+      "from": "browser_sessions",
+      "to": "content_apps",
+      "label": "manual IO",
+      "variant": "emphasis",
+      "route": "straight",
+      "labelDy": -34
+    },
+    {
+      "from": "cdp",
+      "to": "browser_sessions",
+      "label": "automation blocked",
+      "variant": "security",
+      "route": "straight",
+      "labelAt": [850, 715]
+    },
+    {
+      "from": "device_cloud",
+      "to": "content_apps",
+      "label": "evidence only",
+      "variant": "security",
+      "fromSide": "left",
+      "toSide": "right",
+      "route": "orthogonal-h",
+      "labelDy": 74
+    }
+  ],
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AzA PC Command Architecture",
+    "subtitle": "Current command harness, Codex executor, VAN workspace, AzA canonical brain target, browser operating sessions, content apps, agent memory overlays, and read-only VANTA-Brain projection",
+    "output": "aza-pc-architecture.html",
+    "viewBox": [1520, 900]
+  },
+  "schema_version": 1
+}

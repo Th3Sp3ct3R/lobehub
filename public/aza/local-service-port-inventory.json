@@ -1,0 +1,270 @@
+{
+  "azAImplications": [
+    "The LobeHub harness is live on 3010 and can serve static command-center artifacts now.",
+    "The canonical AzA memory service is still not proven live because planned ports 8786-8790 are not listening.",
+    "Postgres and Redis are available locally, but no current check proves they are wired to AzA.",
+    "Desktop/VAN is still in the runtime graph because a service is listening from /Users/growthgod/Desktop/VAN/odysseus.",
+    "Before LobeHub writes to memory, it needs a read-only service adapter that verifies health routes, cwd, repo path, and intended owner for each listener."
+  ],
+  "expectedButNotListening": [
+    {
+      "port": 3001,
+      "expectedRole": "InstaGrowth backend or product service from earlier catalog",
+      "status": "not-listening"
+    },
+    {
+      "port": 3100,
+      "expectedRole": "Paperclip/Suno content service from earlier catalog",
+      "status": "not-listening"
+    },
+    {
+      "port": 3200,
+      "expectedRole": "Hermes UI web dashboard from earlier catalog",
+      "status": "not-listening"
+    },
+    {
+      "port": 3201,
+      "expectedRole": "Hermes dispatch API from earlier catalog",
+      "status": "not-listening"
+    },
+    {
+      "port": 8786,
+      "expectedRole": "planned AzA API or service port",
+      "status": "not-listening"
+    },
+    {
+      "port": 8787,
+      "expectedRole": "planned AzA API or service port",
+      "status": "not-listening"
+    },
+    {
+      "port": 8788,
+      "expectedRole": "planned AzA API or service port",
+      "status": "not-listening"
+    },
+    {
+      "port": 8789,
+      "expectedRole": "planned AzA API or service port",
+      "status": "not-listening"
+    },
+    {
+      "port": 8790,
+      "expectedRole": "planned AzA API or service port",
+      "status": "not-listening"
+    }
+  ],
+  "listeningPorts": [
+    {
+      "port": 3010,
+      "bind": "*",
+      "process": "next-server",
+      "pid": 57877,
+      "cwd": "/Users/growthgod/lobehub",
+      "category": "command-harness-preview",
+      "interpretation": "LobeHub AzA command-center preview is live.",
+      "confidence": "high",
+      "status": "verified-http-200"
+    },
+    {
+      "port": 7001,
+      "bind": "*",
+      "process": "Python",
+      "pid": 12022,
+      "cwd": "/Users/growthgod/Desktop/VAN/odysseus",
+      "category": "legacy-or-alt-vanta-runtime",
+      "interpretation": "A Python service is live from the older Desktop/VAN/odysseus path. This should be reconciled with /Users/growthgod/VAN.",
+      "confidence": "medium",
+      "status": "listening"
+    },
+    {
+      "port": 3005,
+      "bind": "*",
+      "process": "node",
+      "pid": 30007,
+      "cwd": "/Users/growthgod/VAN/suno-engine",
+      "category": "product-runtime",
+      "interpretation": "Suno engine root service appears live.",
+      "confidence": "medium",
+      "status": "listening"
+    },
+    {
+      "port": 3006,
+      "bind": "*",
+      "process": "next-server",
+      "pid": 27598,
+      "cwd": "/Users/growthgod/VAN/suno-engine/web",
+      "category": "product-runtime",
+      "interpretation": "Suno engine web service appears live.",
+      "confidence": "medium",
+      "status": "listening"
+    },
+    {
+      "port": 3003,
+      "bind": "*",
+      "process": "node",
+      "pid": 30578,
+      "cwd": "/Users/growthgod/VAN/Engine",
+      "category": "product-runtime",
+      "interpretation": "Engine service appears live.",
+      "confidence": "medium",
+      "status": "listening"
+    },
+    {
+      "port": 5432,
+      "bind": "127.0.0.1 and ::1",
+      "process": "postgres",
+      "pid": 12043,
+      "cwd": null,
+      "category": "local-database",
+      "interpretation": "Local PostgreSQL is listening.",
+      "confidence": "high",
+      "status": "listening"
+    },
+    {
+      "port": 6379,
+      "bind": "127.0.0.1 and ::1",
+      "process": "redis-server",
+      "pid": 12027,
+      "cwd": null,
+      "category": "local-cache",
+      "interpretation": "Local Redis is listening.",
+      "confidence": "high",
+      "status": "listening"
+    },
+    {
+      "port": 11434,
+      "bind": "*",
+      "process": "ollama",
+      "pid": 12654,
+      "cwd": null,
+      "category": "local-model-runtime",
+      "interpretation": "Ollama local model runtime is listening.",
+      "confidence": "high",
+      "status": "listening"
+    },
+    {
+      "port": 3110,
+      "bind": "127.0.0.1",
+      "process": "node",
+      "pid": 12015,
+      "cwd": "/Users/growthgod/VAN/paperclip-hub",
+      "category": "content-or-product-runtime",
+      "interpretation": "Paperclip hub service is listening locally.",
+      "confidence": "medium",
+      "status": "listening"
+    },
+    {
+      "port": 20128,
+      "bind": "127.0.0.1 and *",
+      "process": "next-server",
+      "pid": "25203 and 25362",
+      "cwd": "/Users/growthgod/.local/share/fnm/node-versions/v22.22.3/installation/lib/node_modules/9router/app",
+      "category": "local-router-runtime",
+      "interpretation": "9router app has local listeners.",
+      "confidence": "medium",
+      "status": "listening"
+    },
+    {
+      "port": 18789,
+      "bind": "127.0.0.1 and ::1",
+      "process": "node",
+      "pid": 34259,
+      "cwd": "/",
+      "category": "unknown-node-loopback",
+      "interpretation": "Unknown Node loopback service. Needs cwd or health route verification before routing.",
+      "confidence": "low",
+      "status": "listening"
+    },
+    {
+      "port": 18791,
+      "bind": "127.0.0.1 and ::1",
+      "process": "node",
+      "pid": 12024,
+      "cwd": "/",
+      "category": "unknown-node-loopback",
+      "interpretation": "Unknown Node loopback service. Needs cwd or health route verification before routing.",
+      "confidence": "low",
+      "status": "listening"
+    },
+    {
+      "port": 9377,
+      "bind": "*",
+      "process": "node",
+      "pid": 37375,
+      "cwd": "/Users/growthgod/camofox-browser",
+      "category": "browser-automation-runtime",
+      "interpretation": "Camofox browser-related service is listening.",
+      "confidence": "medium",
+      "status": "listening"
+    },
+    {
+      "port": 49632,
+      "bind": "127.0.0.1",
+      "process": "node",
+      "pid": 7258,
+      "cwd": "/",
+      "category": "unknown-node-loopback",
+      "interpretation": "Unknown Node loopback service.",
+      "confidence": "low",
+      "status": "listening"
+    },
+    {
+      "port": 50274,
+      "bind": "127.0.0.1",
+      "process": "python3.1",
+      "pid": 18972,
+      "cwd": "/Users/growthgod",
+      "category": "unknown-python-loopback",
+      "interpretation": "Unknown Python loopback service.",
+      "confidence": "low",
+      "status": "listening"
+    },
+    {
+      "port": 7679,
+      "bind": "::1",
+      "process": "Google",
+      "pid": 15501,
+      "cwd": null,
+      "category": "browser-internal",
+      "interpretation": "Google Chrome internal loopback listener.",
+      "confidence": "medium",
+      "status": "listening"
+    }
+  ],
+  "nextActions": [
+    "Add a read-only port adapter in the LobeHub harness that refreshes listeners and checks known health routes.",
+    "Reconcile /Users/growthgod/Desktop/VAN/odysseus with the intended /Users/growthgod/VAN root before trusting runtime routing.",
+    "Start and verify the AzA memory API/MCP services before enabling command-center writes.",
+    "Attach each service to an AzA project record, process owner, expected port, health route, and evidence timestamp.",
+    "Keep unknown loopback listeners read-only until cwd and health route are verified."
+  ],
+  "observedAt": "2026-07-02T16:58:00-04:00",
+  "privacy": {
+    "captured": [
+      "port",
+      "protocol",
+      "bind address",
+      "process name",
+      "pid",
+      "working directory when needed for safe identification",
+      "operator interpretation"
+    ],
+    "excluded": [
+      "environment variables",
+      "raw command arguments",
+      "tokens",
+      "cookies",
+      "API keys",
+      "database contents",
+      "browser tab contents"
+    ]
+  },
+  "schemaVersion": "0.1.0",
+  "source": "read-only lsof and process cwd inspection",
+  "verdict": {
+    "status": "partial-live-service-map",
+    "summary": "Several local services are live, but the planned AzA service ports are not listening. LobeHub /aza is live on port 3010 through the webpack Next preview path. A Hermes/Odysseus-style service is live on port 7001 from the older /Users/growthgod/Desktop/VAN path, so Desktop/VAN is still part of the actual runtime picture.",
+    "recommendedRole": "Use this as a live evidence snapshot for AzA status cards and routing checks.",
+    "notRecommendedRole": "Do not treat process names alone as final service identity; verify cwd, health route, and repo before routing writes."
+  }
+}

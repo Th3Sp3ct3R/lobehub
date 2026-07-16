@@ -1,0 +1,206 @@
+{
+  "apps": [
+    {
+      "name": "Codex",
+      "bundleId": "com.openai.codex",
+      "path": "/Applications/Codex.app",
+      "status": "running",
+      "category": "command-harness",
+      "automationBoundary": "repo edits and commands require path-aware approval"
+    },
+    {
+      "name": "LobeHub",
+      "bundleId": "com.lobehub.lobehub-desktop",
+      "path": "/Applications/LobeHub.app",
+      "status": "running",
+      "category": "command-ui",
+      "automationBoundary": "read command state first; writes route through AzA approval"
+    },
+    {
+      "name": "Hermes",
+      "bundleId": "com.nousresearch.hermes",
+      "path": "/Users/growthgod/.hermes/hermes-agent/apps/desktop/release/mac-arm64/Hermes.app",
+      "status": "running",
+      "category": "agent-runtime",
+      "automationBoundary": "promote verified agent outputs to AzA with provenance"
+    },
+    {
+      "name": "Google Chrome",
+      "bundleId": "com.google.Chrome",
+      "path": "/Applications/Google Chrome.app",
+      "status": "running",
+      "category": "browser-webapp-surface",
+      "automationBoundary": "read-only until active tab, account, and action scope are approved"
+    },
+    {
+      "name": "Comet",
+      "bundleId": "ai.perplexity.comet",
+      "path": "/Applications/Comet.app",
+      "status": "running",
+      "category": "browser-research-surface",
+      "automationBoundary": "read-only research capture unless user approves interaction"
+    },
+    {
+      "name": "Kimi",
+      "bundleId": "com.moonshot.kimichat",
+      "path": "/Applications/Kimi.app",
+      "status": "running",
+      "category": "ai-generation",
+      "automationBoundary": "capture generated outputs and prompts only after review"
+    },
+    {
+      "name": "Gemini",
+      "bundleId": "com.google.GeminiMacOS",
+      "path": "/Applications/Gemini.app",
+      "status": "running",
+      "category": "ai-generation",
+      "automationBoundary": "capture generated outputs and prompts only after review"
+    },
+    {
+      "name": "MiniMax Hub",
+      "bundleId": "com.minimax.hub.global",
+      "path": "/Applications/MiniMax Hub.app",
+      "status": "running",
+      "category": "ai-generation",
+      "automationBoundary": "capture generated media metadata and exports only"
+    },
+    {
+      "name": "MiniMax Code",
+      "bundleId": "com.minimax.agent",
+      "path": "/Applications/MiniMax Code.app",
+      "status": "running",
+      "category": "coding-agent",
+      "automationBoundary": "repo writes require source path and validation evidence"
+    },
+    {
+      "name": "Cluely (New)",
+      "bundleId": "com.cluely.app.april22",
+      "path": "/Applications/Cluely (New).app",
+      "status": "running",
+      "category": "ai-assistant-unclassified",
+      "automationBoundary": "classify purpose before automation"
+    },
+    {
+      "name": "DuoPlus",
+      "bundleId": "com.duoplus.app",
+      "path": "/Applications/DuoPlus.app",
+      "status": "running",
+      "category": "device-operations",
+      "automationBoundary": "no account-changing action without explicit approval"
+    },
+    {
+      "name": "AutoClaw",
+      "bundleId": "com.zhipuai.autoclaw",
+      "path": "/private/var/folders/49/drh078791t717f4vzns8l4fc0000gn/T/AppTranslocation/E8534357-9558-45F2-810B-2A0257A9BC83/d/AutoClaw.app",
+      "status": "running",
+      "category": "device-or-agent-operations",
+      "automationBoundary": "translocated app; classify before trusting path or automation"
+    },
+    {
+      "name": "Discord",
+      "bundleId": "com.hnc.Discord",
+      "path": "/Applications/Discord.app",
+      "status": "running",
+      "category": "communication",
+      "automationBoundary": "summaries only; do not capture raw private message content"
+    },
+    {
+      "name": "Telegram",
+      "bundleId": "com.tdesktop.Telegram",
+      "path": "/Applications/Telegram.app",
+      "status": "running",
+      "category": "communication",
+      "automationBoundary": "summaries only; outbound messages require approval"
+    },
+    {
+      "name": "Messages",
+      "bundleId": "com.apple.MobileSMS",
+      "path": "/System/Applications/Messages.app",
+      "status": "frontmost-running",
+      "category": "communication",
+      "automationBoundary": "do not read or send message contents without explicit approval"
+    },
+    {
+      "name": "Notion",
+      "bundleId": "notion.id",
+      "path": "/Applications/Notion.app",
+      "status": "running",
+      "category": "knowledge-workspace",
+      "automationBoundary": "read-only until workspace, page, and write destination are approved"
+    },
+    {
+      "name": "Wispr Flow",
+      "bundleId": "com.electron.wispr-flow",
+      "path": "/Applications/Wispr Flow.app",
+      "status": "running",
+      "category": "voice-input",
+      "automationBoundary": "capture transcript exports only after user review"
+    },
+    {
+      "name": "Willow Voice",
+      "bundleId": "com.seewillow.WillowMac",
+      "path": "/Applications/Willow Voice.app",
+      "status": "running",
+      "category": "voice-input",
+      "automationBoundary": "capture transcript exports only after user review"
+    },
+    {
+      "name": "Voice Memos",
+      "bundleId": "com.apple.VoiceMemos",
+      "path": "/System/Applications/VoiceMemos.app",
+      "status": "running",
+      "category": "audio-capture",
+      "automationBoundary": "do not index recordings unless explicitly selected"
+    },
+    {
+      "name": "CastCodes",
+      "bundleId": "dev.castcodes.CastCodes",
+      "path": "/Volumes/CastCodes/CastCodes.app",
+      "status": "running",
+      "category": "creative-or-code-tooling",
+      "automationBoundary": "classify source, export path, and persistence before automation"
+    },
+    {
+      "name": "Tailscale",
+      "bundleId": "io.tailscale.ipn.macos",
+      "path": "/Applications/Tailscale.app",
+      "status": "running",
+      "category": "network-infrastructure",
+      "automationBoundary": "read status only unless network change is approved"
+    }
+  ],
+  "nextAuditFields": [
+    "active account label",
+    "login state label",
+    "default export path",
+    "allowed automation mode",
+    "related AzA project",
+    "related agent",
+    "last verified at",
+    "evidence pointer"
+  ],
+  "observedAt": "2026-07-02T20:36:00-04:00",
+  "privacy": {
+    "captured": [
+      "app name",
+      "bundle id",
+      "install path",
+      "runtime status",
+      "command-center category",
+      "safe automation boundary"
+    ],
+    "excluded": [
+      "window contents",
+      "browser tabs",
+      "messages",
+      "documents",
+      "cookies",
+      "tokens",
+      "passwords",
+      "API keys",
+      "raw login state"
+    ]
+  },
+  "schemaVersion": "0.1.0",
+  "source": "computer-use:list_apps"
+}

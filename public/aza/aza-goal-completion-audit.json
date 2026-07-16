@@ -1,0 +1,376 @@
+{
+  "auditMethod": {
+    "rule": "Treat completion as unproven until each original requirement has current evidence.",
+    "evidenceTypes": [
+      "rendered LobeHub page",
+      "public JSON artifact",
+      "read-only filesystem inventory",
+      "Computer Use app inventory",
+      "codebase-memory-mcp graph evidence",
+      "HTTP response",
+      "live readiness route",
+      "live app map route",
+      "live GTM map route",
+      "live team data routing route",
+      "live command gates route",
+      "live implementation proof route",
+      "live AzA verification runbook route",
+      "live canonical store route",
+      "live Codex harness route",
+      "live command record schema route",
+      "live communication protocols route",
+      "live memory intake funnel route",
+      "live VANTA-Brain coverage route",
+      "live daily command workflow route",
+      "live execution sequence route",
+      "live approval packet route",
+      "live delivery roadmap route",
+      "live browser task tooling route",
+      "live tooling recommendation plan route",
+      "live brain topology route",
+      "live agent access matrix route",
+      "live agent fleet map route",
+      "live content operations route",
+      "live content app audit route",
+      "live access capability route",
+      "live ownership resolution route",
+      "live project map route",
+      "live workspace root reconciliation route",
+      "live memory map route",
+      "live service map route",
+      "live operating board route",
+      "live operating records route",
+      "live system map route",
+      "live goal completion audit route",
+      "browser smoke screenshot",
+      "live port check"
+    ],
+    "scope": "This audit covers the current command-center implementation, including static artifacts, the read-only live readiness route, the read-only canonical store readiness route, the read-only Codex harness route, the read-only command record schema route, the read-only communication protocols route, the read-only MCP/tooling map route, the read-only browser task tooling route, the read-only tooling recommendation plan route, the read-only memory intake funnel route, the read-only VANTA-Brain coverage route, the read-only daily command workflow route, the read-only execution sequence route, the read-only approval packet route, the read-only delivery roadmap route, the read-only live app map route, the read-only live GTM map route, the read-only live team data routing route, the read-only live command gates route, the read-only live implementation proof route, the read-only live AzA verification runbook route, the read-only live brain topology route, the read-only live agent access matrix route, the read-only live agent fleet map route, the read-only live content operations route, the read-only live content app audit route, the read-only live access capability route, the read-only live ownership resolution route, the read-only live project map route, the read-only live workspace root reconciliation route, the read-only live memory map route, the read-only live service map route, the derived operating board route, the read-only live operating records route, the read-only system map route, and the live goal completion audit route. It does not claim that dynamic AzA API/MCP memory adapters are complete."
+  },
+  "durableBoardProof": {
+    "projectId": "aza-board-proof-1783137327451",
+    "projectReadOk": true,
+    "projectWriteOk": true,
+    "status": "passed",
+    "taskId": "task-board-proof-1783137327451",
+    "taskReadOk": true,
+    "taskWriteOk": true
+  },
+  "durableEvidenceProof": {
+    "action": "handoff.created",
+    "evidenceId": "aza-evidence-proof-1783137760577",
+    "evidenceReadOk": true,
+    "evidenceWriteOk": true,
+    "status": "passed",
+    "targetId": "aza-codex-handoff-proof-1783137760577",
+    "targetType": "handoff"
+  },
+  "durableHandoffProof": {
+    "browserSessionIoPlanned": true,
+    "handoffId": "aza-codex-handoff-proof-1783137760577",
+    "handoffReadOk": true,
+    "handoffWriteOk": true,
+    "queue": "codex.handoff",
+    "status": "passed",
+    "target": "LobeHub harness to Codex executor"
+  },
+  "durableOperatingRecordProof": {
+    "allRecordTypesReadOk": true,
+    "allRecordTypesWriteOk": true,
+    "apiRoute": "/v1/operating-records",
+    "proofId": "aza-operating-proof-1783138373089",
+    "recordIds": [
+      "aza-operating-offer-proof-1783138373089",
+      "aza-operating-lead-proof-1783138373089",
+      "aza-operating-pilot-proof-1783138373089",
+      "aza-operating-task-proof-1783138373089",
+      "aza-operating-content-proof-1783138373089",
+      "aza-operating-publish-proof-1783138373089",
+      "aza-operating-measurement-proof-1783138373089"
+    ],
+    "recordTypes": ["offer", "lead", "pilot", "task", "content", "publish", "measurement"],
+    "status": "passed"
+  },
+  "durableStoreProof": {
+    "apiReadOk": true,
+    "apiWriteOk": true,
+    "conversationId": "aza-durable-proof-1783136786853",
+    "databaseUrlLabel": "postgresql://growthgod@127.0.0.1:55432/aza_codex_proof",
+    "extensions": ["uuid-ossp", "vector"],
+    "mcpReadOk": true,
+    "messageCount": 1,
+    "migrationPublicTables": 32,
+    "sharedStoreProof": true,
+    "status": "passed"
+  },
+  "liveBlockers": [
+    {
+      "blocker": "AzA durable GTM/content/projection adapters are partial",
+      "evidence": "Live readiness sees healthy listeners on 8786 gateway, 8787 API, 8788 MCP, 8789 sync, and 8790 worker; API /ready now reports mode=postgres against the local proof database. Durable project/task, Codex handoff, evidence, and operating record writes are proven.",
+      "impact": "Durable board, handoff, evidence, and offer/lead/pilot/task/content/publish/measurement records exist, but approval decisions, native LobeHub task creation, browser-session adapters, app account/output metadata, and VANTA-Brain projection still need adapters."
+    },
+    {
+      "blocker": "Durable store runtime depends on local Postgres proof process",
+      "evidence": "The current durable proof uses Postgres 16 on 127.0.0.1:55432 with pgvector installed from source and DATABASE_URL supplied to the AzA dev stack.",
+      "impact": "The proof is live and valid for this session, but it should be converted into a repeatable startup script or Docker path before being treated as permanent infrastructure."
+    },
+    {
+      "blocker": "Sync and worker are partial",
+      "evidence": "Sync provider fetch is not configured; worker queue list is broad but only extract.knowledge processor was observed.",
+      "impact": "Native conversation sync, memory proposal flow, embeddings, search indexing, and projection are not complete."
+    },
+    {
+      "blocker": "VANTA-Brain projection prohibited",
+      "evidence": "User explicitly prohibited writes to VANTA-Brain during this pass.",
+      "impact": "Projection can be designed but not executed."
+    },
+    {
+      "blocker": "VANTA-Brain direct scan is blocked",
+      "evidence": "The live VANTA-Brain coverage route reports root present but projectionScanTimedOut=true and projectionScanBlocked=true.",
+      "impact": "The vault cannot be treated as reliable command-center context until directory enumeration is repaired or the projection path is relocated."
+    }
+  ],
+  "nextProofGates": [
+    {
+      "gate": "start_and_verify_aza_services",
+      "proofNeeded": "Keep /aza/live-readiness green: GET /health succeeds for gateway, API, MCP, sync, and worker on 127.0.0.1 ports 8786-8790, while /ready mode is tracked separately."
+    },
+    {
+      "gate": "verify_postgres_canonical_store",
+      "proofNeeded": "Migrations run, pgvector exists, expected tables exist, API and MCP both use the same durable Postgres store."
+    },
+    {
+      "gate": "verify_mcp_tools",
+      "proofNeeded": "MCP initialize succeeds, tool list is visible, all six implemented retrieval tools return structured responses to safe probes, placeholders are marked unavailable, and API/MCP shared-store proof exists."
+    },
+    {
+      "gate": "extend_lobehub_read_adapter_to_records",
+      "proofNeeded": "LobeHub reads live AzA operating records, board records, and app registry records after service health, schema, durable store, and MCP gates are verified."
+    },
+    {
+      "gate": "build_first_durable_board",
+      "proofNeeded": "Daily Command, GTM, or Content Factory board reads durable typed AzA records and shows owner, status, evidence, and next action."
+    },
+    {
+      "gate": "projection_approval",
+      "proofNeeded": "User approves a specific VANTA-Brain projection target after canonical AzA write and redaction verification."
+    }
+  ],
+  "observedAt": "2026-07-04T04:25:06Z",
+  "overallStatus": "partially_complete_static_command_center_ready_live_brain_blocked",
+  "requirementCoverage": [
+    {
+      "id": "define_pc_architecture",
+      "requirement": "Define the PC architecture so the current organization is understandable.",
+      "status": "partial",
+      "evidence": [
+        "/aza/vanta-aza-architecture.html",
+        "/aza/vanta-aza-architecture.architecture.json",
+        "/aza/aza-source-of-truth-map.json",
+        "/aza/local-service-port-inventory.json",
+        "/aza/live-readiness",
+        "/aza/live-app-map",
+        "/aza/live-gtm-map",
+        "/aza/live-team-data-routing",
+        "/aza/live-command-gates",
+        "/aza/live-implementation-proof",
+        "/aza/live-aza-verification-runbook",
+        "/aza/live-canonical-store",
+        "/aza/live-codex-harness",
+        "/aza/live-command-record-schema",
+        "/aza/live-communication-protocols",
+        "/aza/live-mcp-tooling-map",
+        "/aza/live-architecture-data-flow",
+        "/aza/live-aza-implementation",
+        "/aza/aza-pc-architecture.html",
+        "/aza/aza-pc-architecture.architecture.json",
+        "/aza/aza-pc-architecture.png",
+        "/aza/live-memory-intake-funnel",
+        "/aza/live-vanta-brain-coverage",
+        "/aza/live-daily-command-workflow",
+        "/aza/live-execution-sequence",
+        "/aza/live-approval-packet",
+        "/aza/live-delivery-roadmap",
+        "/aza/live-browser-task-tooling-map",
+        "/aza/live-tooling-recommendation-plan",
+        "/aza/live-brain-topology",
+        "/aza/live-agent-access-matrix",
+        "/aza/live-agent-fleet-map",
+        "/aza/live-content-ops",
+        "/aza/live-content-app-audit",
+        "/aza/live-access-capability-map",
+        "/aza/live-ownership-resolution",
+        "/aza/live-project-map",
+        "/aza/live-workspace-root-reconciliation",
+        "/aza/live-memory-map",
+        "/aza/live-service-map",
+        "/aza/live-system-map",
+        "/aza/live-goal-completion-audit"
+      ],
+      "remaining": "The live app map now refreshes installed and visible app surfaces; the live GTM map derives lanes, schemas, owners, and approval boundaries; the live team data routing map connects team lanes to record routes, handoffs, storage boundaries, owners, and write blockers; the live daily command workflow map shows how operator intent moves through LobeHub, Codex, evidence capture, durable-record gates, memory promotion, content operations, and VANTA-Brain projection blockers; the live command gates map exposes read gates, blocked writes, approval-required actions, and next proof steps; the live implementation proof map orders the remaining service, store, MCP, adapter, durable-board, and projection proof gates; the live AzA verification runbook turns those blockers into exact service health probes, approval-required VAN command previews, Postgres/pgvector proof, MCP tool proof, shared-store proof, and expected evidence; the live approval packet turns the approval-gated runtime, content app, and projection blockers into exact approval text, allowed command classes, blocked command classes, evidence rules, rollback labels, and command previews; the live delivery roadmap turns those gates into operator workstreams and milestones; the live browser task tooling map recommends Browser Plugin, Computer Use, CDP/RPC, MCP, and Codex task routing while preserving AzA as the durable memory source of truth; the live tooling recommendation plan turns that recommendation into ordered read-only phases for LobeHub, Browser Plugin, CDP/RPC approval, MCP verification, Codex execution, AzA memory promotion, and VANTA-Brain projection; the live MCP/tooling map catalogs MCP client config presence, safe top-level server names, AzA MCP implemented and placeholder tools, channels, and proof steps without exposing commands, args, env values, tokens, or tool payloads; the live canonical store map checks required environment presence, supported driver, and store proof tasks without exposing secrets or touching database contents; the live Codex harness map shows LobeHub task/runtime primitives, manual-active Codex execution lanes, durable handoff blockers, approval-required content/device lanes, and evidence contracts; the live command record schema map defines the command, approval, execution, evidence, GTM, content, memory, and projection records required before durable writes; the live communication protocols map shows how operator intent, LobeHub, Codex, VAN, AzA API, MCP, Postgres, agent runtimes, content apps, local services, and VANTA-Brain exchange information and which channels are blocked; the live architecture data-flow map condenses that into nodes, edges, gates, payload classes, approval rules, blockers, and route evidence; the live AzA implementation map inventories /Users/growthgod/VAN/aza_memory files, service entrypoints, package scripts, env names, database tables, compose services, healthchecks, localhost port bindings, migration metadata, API capabilities, and MCP tools as safe metadata; the Archify PC architecture diagram renders the same current architecture as a standalone HTML/source/PNG artifact; the live memory intake funnel maps granular Codex, Hermes, agent skill, VAN project, content app, GTM, and projection sources into AzA intake stages with approval, evidence, canonical write, MCP, and projection blockers; the live VANTA-Brain coverage map compares projection folders against documentation, agent, skill, session, memory, and project source roots using metadata only; the live brain topology map models unified AzA brain namespaces, granular agent/session overlays, access profiles, and promotion steps; the live agent access matrix maps runtime roles to readable namespaces, writable lanes, session scopes, denied surfaces, and approval requirements; the live agent fleet map inventories Hermes agents, skill roots, manifests, categories, and namespace routes without reading raw bodies; the live content operations map organizes content apps into production stages, approval queues, registry gaps, and future write-back records; the live content app audit map shows missing account labels, auth pointers, output paths, output kinds, evidence pointers, and approval gates before capture or publishing; the live access capability map explains what logged-in browser, Electron, content, communication, coding, and device surfaces can safely do by capability class without reading private login contents; the live ownership resolution map resolves source-of-truth ownership, ambiguous roots, write lanes, and approval policies; the live project map refreshes VAN, LobeHub, and Desktop/VAN top-level project roots; the live workspace root reconciliation map shows LobeHub as the harness, VAN as approval-gated runtime workspace, AzA memory as blocked canonical target, VANTA-Brain as read-only projection vault, and Desktop/VAN as legacy runtime needing reconciliation; the live memory map refreshes agent, skill, session, memory, and projection root counts; the live service map refreshes listener and process-cwd state; and the live system map combines root checks, service status, brain topology, memory intake, VANTA-Brain coverage, daily command workflow, agent fleet, workspace reconciliation, team data routing, architecture data flow, MCP/tooling status, browser task tooling recommendations, AzA implementation, compose, and migration metadata, AzA verification runbook status, approval packet state, content operations, content app audit, access capability status, app inventory, board state, and communication edges. Richer adapters still need live AzA memory records, durable boards, and write-gate verification."
+    },
+    {
+      "id": "explain_information_organization_before_changes",
+      "requirement": "Explain how information is organized before making changes in VAN or LobeHub.",
+      "status": "complete_for_lobehub_changes",
+      "evidence": ["/aza/aza-source-of-truth-map.json", "/aza/aza-read-write-contract.json"],
+      "remaining": "Any future VAN write still needs a specific target, reason, rollback, and approval."
+    },
+    {
+      "id": "do_not_write_vanta_brain",
+      "requirement": "Do not write changes to /Users/growthgod/Documents/VANTA-Brain.",
+      "status": "complete_this_pass",
+      "evidence": ["/aza/vanta-brain-readonly-audit.json", "/aza/aza-read-write-contract.json"],
+      "remaining": "Projection remains blocked until canonical AzA records exist and explicit approval is given."
+    },
+    {
+      "id": "audit_vanta_brain_coverage",
+      "requirement": "Read through VANTA-Brain enough to determine whether it logs documentation, agent memories, and skills.",
+      "status": "partial",
+      "evidence": [
+        "/aza/vanta-brain-readonly-audit.json",
+        "/aza/agent-memory-skill-inventory.json",
+        "/aza/live-vanta-brain-coverage",
+        "/aza/live-vanta-brain-diagnostics"
+      ],
+      "remaining": "The live coverage route now proves only that the VANTA-Brain root exists. Direct projection enumeration is blocked/timing out, so documentation, agent, skill, session, memory, and project coverage are unverified until the vault path is repaired or relocated. It does not prove complete canonical logging or sync."
+    },
+    {
+      "id": "brain_design_choice",
+      "requirement": "Decide whether unified skills and knowledge base or granular agent-held skills is better.",
+      "status": "complete_design_decision",
+      "evidence": [
+        "/aza/aza-source-of-truth-map.json",
+        "/aza/agent-memory-skill-inventory.json",
+        "/aza/aza-read-write-contract.json"
+      ],
+      "remaining": "Implementation still needs live AzA records and access-control enforcement."
+    },
+    {
+      "id": "organize_main_brain_command_center",
+      "requirement": "Come up with a plan to write and read from the main brain AzA command center under LobeHub or command context.",
+      "status": "partial",
+      "evidence": [
+        "/aza/aza-read-write-contract.json",
+        "/aza/aza-source-of-truth-map.json",
+        "/aza/aza-brain-readiness-audit.json",
+        "/aza/live-readiness",
+        "/aza/live-implementation-proof",
+        "/aza/live-canonical-store",
+        "/aza/live-codex-harness",
+        "/aza/live-command-record-schema",
+        "/aza/live-communication-protocols",
+        "/aza/live-memory-intake-funnel",
+        "/aza/live-vanta-brain-coverage",
+        "/aza/live-daily-command-workflow",
+        "/aza/live-brain-topology",
+        "/aza/live-agent-access-matrix",
+        "/aza/live-ownership-resolution"
+      ],
+      "remaining": "AzA API/MCP services are live in Postgres mode for the current proof stack. Canonical API/MCP read/write is proven with a synthetic API-write/MCP-read record, but durable command, approval, evidence, board, and projection records are still not implemented."
+    },
+    {
+      "id": "lobehub_harness_codex_executor",
+      "requirement": "Represent LobeHub as the harness and Codex as the coding executor.",
+      "status": "complete_current_artifacts",
+      "evidence": [
+        "/aza/aza-source-of-truth-map.json",
+        "/aza/aza-read-write-contract.json",
+        "/aza/live-codex-harness",
+        "/aza/live-command-record-schema",
+        "/aza/live-communication-protocols",
+        "/aza/gtm-team-operating-model.json"
+      ],
+      "remaining": "The live Codex harness map now distinguishes current manual Codex execution from durable LobeHub-to-Codex handoff, the command record schema defines the required records, and the communication protocol map shows the handoff channel blockers, but dynamic task creation/routing into Codex is not implemented yet."
+    },
+    {
+      "id": "organize_gtm_strategy",
+      "requirement": "Start organizing go-to-market strategy and team data.",
+      "status": "partial",
+      "evidence": [
+        "/aza/gtm-team-operating-model.json",
+        "/aza/content-generation-app-registry.json",
+        "/aza/live-operating-board",
+        "/aza/live-operating-records",
+        "/aza/live-gtm-map",
+        "/aza/live-team-data-routing",
+        "/aza/live-daily-command-workflow",
+        "/aza/live-system-map"
+      ],
+      "remaining": "The read-only operating board now consumes live AzA operating records for offer, lead, pilot, task, content, publish, and measurement, and the visible LobeHub board renders those sanitized rows. Browser-session adapters and real app/account/output metadata are still missing."
+    },
+    {
+      "id": "organize_application_development",
+      "requirement": "Develop the application and organize how the team stores and routes data.",
+      "status": "partial",
+      "evidence": [
+        "/aza/van-project-root-inventory.json",
+        "/aza/live-command-gates",
+        "/aza/live-implementation-proof",
+        "/aza/live-codex-harness",
+        "/aza/live-command-record-schema",
+        "/aza/live-communication-protocols",
+        "/aza/live-memory-intake-funnel",
+        "/aza/live-daily-command-workflow",
+        "/aza/live-team-data-routing",
+        "/aza/live-brain-topology",
+        "/aza/live-content-ops",
+        "/aza/live-content-app-audit",
+        "/aza/live-ownership-resolution",
+        "/aza/live-project-map",
+        "/aza/aza-brain-readiness-audit.json",
+        "/aza/aza-source-of-truth-map.json",
+        "/aza/live-service-map",
+        "/aza/live-system-map"
+      ],
+      "remaining": "Live database connection proof, durable AzA store wiring, implemented MCP retrieval coverage, API/MCP shared-store proof, durable project/task board writes, durable LobeHub-to-Codex handoff, durable evidence records, and live GTM/content operating records now exist for the current local proof stack. Visible LobeHub table UI, browser-session adapters, app account/output metadata, projection approval, and writable LobeHub board/UI wiring are still missing. The daily command workflow is currently read-only/manual."
+    },
+    {
+      "id": "granular_agent_memory_model",
+      "requirement": "Segment the brain by agent and session so knowledge can be accessed according to agent permission.",
+      "status": "partial",
+      "evidence": [
+        "/aza/agent-memory-skill-inventory.json",
+        "/aza/live-memory-map",
+        "/aza/live-vanta-brain-coverage",
+        "/aza/live-memory-intake-funnel",
+        "/aza/live-brain-topology",
+        "/aza/live-agent-access-matrix",
+        "/aza/live-agent-fleet-map",
+        "/aza/aza-source-of-truth-map.json",
+        "/aza/aza-brain-readiness-audit.json"
+      ],
+      "remaining": "The live memory map verifies source roots and counts, the live memory intake funnel maps granular source categories through access, evidence, canonical write, MCP retrieval, and projection gates, the live brain topology map defines namespaces, access profiles, source roots, and promotion steps, the live agent access matrix maps agent/runtime roles to namespace access and approval requirements, and the live agent fleet map inventories Hermes agents, skill roots, manifests, categories, and namespace routes, but canonical storage and access enforcement are not verified live."
+    },
+    {
+      "id": "organize_webapps_electron_content_generation",
+      "requirement": "Organize every webapp and Electron application used for content generation.",
+      "status": "partial",
+      "evidence": [
+        "/aza/app-surface-inventory.json",
+        "/aza/content-generation-app-registry.json",
+        "/aza/live-app-map",
+        "/aza/live-content-ops",
+        "/aza/live-content-app-audit",
+        "/aza/live-access-capability-map",
+        "/aza/live-browser-task-tooling-map",
+        "/aza/live-tooling-recommendation-plan",
+        "/aza/live-browser-operating-sessions",
+        "/aza/live-system-map"
+      ],
+      "remaining": "Current inventory, content operations routing, content app audit, access capability map, browser task tooling recommendation, tooling recommendation plan, and browser operating-session readiness are privacy-safe and exclude tabs, actual login state, private content, export folders, generated media contents, and raw credentials. Manual visible browser sessions are usable, but CDP HTTP and Computer Use runtime are blocked. The audit still identifies missing account labels, auth pointers, output paths, output kinds, and evidence pointers; any app-backed capture, publishing, messaging, buying, device, or account-changing action remains approval-first."
+    },
+    {
+      "id": "do_not_write_van",
+      "requirement": "Do not make changes in /Users/growthgod/VAN without first explaining information organization.",
+      "status": "complete_this_pass",
+      "evidence": [
+        "/aza/aza-source-of-truth-map.json",
+        "/aza/aza-read-write-contract.json",
+        "/aza/aza-brain-readiness-audit.json"
+      ],
+      "remaining": "No VAN writes were made while building the LobeHub command-center artifacts. Existing dirty VAN changes were observed but untouched."
+    }
+  ],
+  "summary": "The current LobeHub AzA command center now proves the architecture, source ownership, workspace root reconciliation, memory design, memory intake funnel design, daily command workflow, execution sequence, approval packet, delivery roadmap, browser task tooling recommendation, browser operating-session model, tooling recommendation plan, agent access model, agent fleet metadata model, app inventory, content operations model, content app audit model, access capability model, team data routing model, project inventory, GTM model, readiness blockers, first read-only live health adapter, first live canonical store readiness map, first live Codex harness bridge, first live command record schema map, first live communication protocol map, first live MCP/tooling map with initialize/tools-list/all implemented retrieval tool coverage and placeholder proof, durable Postgres/pgvector proof, API-write/MCP-read shared-store proof, durable project/task board write proof, durable LobeHub-to-Codex handoff proof, durable evidence proof, durable operating-record proof, first live browser task tooling map, first live app map with safe bundle metadata and Chrome/webapp wrapper detection, first live GTM map, first live team data routing map, first live daily command workflow map, first live execution sequence map, first live approval packet map, first live command gates map, first live implementation proof map, first live AzA verification runbook map, first live brain topology map, first live agent access matrix map, first live agent fleet map, first live content operations map, first live content app audit map, first live access capability map, first live ownership resolution map, first live project map, first live workspace root reconciliation map, first live AzA implementation, compose, and migration metadata map, first live memory map, first live service map, first derived operating board, first visible sanitized operating-record table, first live operating records route, first live system map, and first live goal completion audit map. The full goal is not complete because browser-session input/output adapter wiring, VANTA-Brain directory enumeration, approved VANTA-Brain projection, and content-app account/output mapping are still missing."
+}

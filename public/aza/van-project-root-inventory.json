@@ -1,0 +1,183 @@
+{
+  "azAIndexPolicy": [
+    {
+      "recordType": "project",
+      "rule": "Index every top-level VAN directory as a candidate project/workspace with category, path, safe markers, owner, status, and verification timestamp."
+    },
+    {
+      "recordType": "repo",
+      "rule": "For directories with .git, inspect branch and remote only through a secret-safe sanitizer before storing anything."
+    },
+    {
+      "recordType": "app_or_service",
+      "rule": "For directories with package.json, pnpm-workspace.yaml, Dockerfile, docker-compose.yml, pyproject.toml, or Makefile, index available scripts and service markers only after secret-safe parsing."
+    },
+    {
+      "recordType": "instruction_source",
+      "rule": "For AGENTS.md and CLAUDE.md, record path and precedence first; read content only when working inside that project."
+    },
+    {
+      "recordType": "projection",
+      "rule": "Project reviewed project summaries to VANTA-Brain only after AzA has canonical project records and current evidence."
+    }
+  ],
+  "categoryCounts": {
+    "root-config-or-cache": 5,
+    "memory-brain": 5,
+    "product-repo": 11,
+    "agent-runtime": 13,
+    "device-ops": 2,
+    "ui-app": 2,
+    "content-media": 4,
+    "docs-archive": 4,
+    "workspace-or-uncategorized": 30
+  },
+  "counts": {
+    "topLevelDirectories": 76,
+    "gitRepositories": 35,
+    "packageJsonProjects": 32,
+    "agentInstructionFiles": 11,
+    "claudeInstructionFiles": 12,
+    "pnpmWorkspaces": 6
+  },
+  "groupedDirectories": {
+    "root-config-or-cache": [".claude", ".git", ".gstack", ".playwright-mcp", ".tmp"],
+    "memory-brain": ["AzaZal", "aZa", "aza_memory", "aza_tgbot", "memory"],
+    "product-repo": [
+      "Engine",
+      "Oracle",
+      "etymology-engine",
+      "growthgod-landing",
+      "instagram-id-scraper",
+      "instagram-php-main",
+      "instagram-service",
+      "instagrowth-legacy",
+      "instagrowth-saas",
+      "osint-wiki-frontend 3",
+      "suno-engine"
+    ],
+    "agent-runtime": [
+      "Osint-Agent",
+      "SeekerClaw",
+      "VantaLABs_gg-agent-logging",
+      "agents",
+      "hermes-agent",
+      "hermes-core",
+      "hermes-voice-agent",
+      "hermesUI",
+      "openclaw",
+      "openclaw-v2",
+      "psi-claw",
+      "upwork-agent",
+      "vanta-agent-kit"
+    ],
+    "device-ops": ["duoplus", "mattclone-duo"],
+    "ui-app": ["business builders", "vanta-command-center"],
+    "content-media": ["brand-lookbook", "content-pipeline", "paperclip-hub", "pocket-studio"],
+    "docs-archive": ["docs", "documents", "reports", "daily-reports"],
+    "workspace-or-uncategorized": [
+      "CodexBar",
+      "GLSB_3",
+      "LLM",
+      "Matt_clone",
+      "Quantzy",
+      "SESSIONS",
+      "VantaLABs_gg",
+      "accounting",
+      "attraction-coach",
+      "business-model",
+      "council-of-high-intelligence",
+      "crashwatch",
+      "data",
+      "doc-crawler",
+      "doppelganger",
+      "hermetica",
+      "js-port",
+      "js-port-tests",
+      "llm-hardware-match",
+      "mcp-services",
+      "mobileharness",
+      "odysseus-fal",
+      "odysseus-sync",
+      "openrouter-monitor",
+      "phantom-graph",
+      "shared-configs",
+      "utter",
+      "vanta-ci",
+      "vanta-intel-mcp",
+      "vantalabs-theme"
+    ]
+  },
+  "keyPaths": [
+    {
+      "path": "/Users/growthgod/VAN/aza_memory",
+      "category": "memory-brain",
+      "role": "Current intended AzA canonical memory service implementation root."
+    },
+    {
+      "path": "/Users/growthgod/lobehub",
+      "category": "command-harness",
+      "role": "Final AzA/LobeHub operator harness, outside VAN."
+    },
+    {
+      "path": "/Users/growthgod/Documents/VANTA-Brain",
+      "category": "projection-vault",
+      "role": "Human-readable projection vault, outside VAN."
+    },
+    {
+      "path": "/Users/growthgod/VAN/instagrowth-saas",
+      "category": "product-repo",
+      "role": "GTM/product execution repo for Instagram growth SaaS."
+    },
+    {
+      "path": "/Users/growthgod/VAN/hermesUI",
+      "category": "agent-runtime",
+      "role": "Hermes UI and dispatch surface."
+    },
+    {
+      "path": "/Users/growthgod/VAN/openclaw",
+      "category": "agent-runtime",
+      "role": "OpenClaw reference/runtime implementation."
+    },
+    {
+      "path": "/Users/growthgod/VAN/duoplus",
+      "category": "device-ops",
+      "role": "Device operations support and DuoPlus integration material."
+    }
+  ],
+  "nextActions": [
+    "Build a read-only LobeHub adapter that refreshes this VAN inventory.",
+    "Classify the 30 workspace-or-uncategorized directories into project, archive, config, experiment, or retire lanes.",
+    "Connect each project record to agents, skills, sessions, apps, GTM records, and evidence artifacts.",
+    "Add secret-safe repo metadata sanitization before indexing remotes or branch information.",
+    "Use AzA project records as the source for the LobeHub command-center project board."
+  ],
+  "observedAt": "2026-07-02T16:55:00-04:00",
+  "root": "/Users/growthgod/VAN",
+  "safety": {
+    "captured": [
+      "top-level directory names",
+      "broad category labels",
+      "safe marker counts",
+      "presence of repo/config marker files"
+    ],
+    "excluded": [
+      "env files",
+      "raw secrets",
+      "tokens",
+      "cookies",
+      "git remotes",
+      "file contents",
+      "private messages",
+      "customer credentials"
+    ]
+  },
+  "schemaVersion": "0.1.0",
+  "source": "read-only top-level filesystem inventory of /Users/growthgod/VAN",
+  "verdict": {
+    "status": "mixed-project-runtime-root",
+    "summary": "VAN is not one app. It is the active project/runtime root containing AzA memory services, product repos, agent runtimes, device operations, content/media tooling, UI apps, docs/archive folders, and workspace config/cache folders.",
+    "recommendedRole": "active implementation and runtime workspace",
+    "notRecommendedRole": "canonical memory database or final operator harness"
+  }
+}

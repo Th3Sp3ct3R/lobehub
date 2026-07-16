@@ -1,0 +1,486 @@
+{
+  "approvalGates": [
+    {
+      "gate": "aza_health_live",
+      "requiredBefore": ["canonical_memory_write", "mcp_query_route"],
+      "rule": "AzA API and MCP services must expose known health routes, expected ports, repo ownership, and current schema before LobeHub can write canonical records."
+    },
+    {
+      "gate": "schema_verified",
+      "requiredBefore": ["canonical_memory_write", "projection_write"],
+      "rule": "The target record type, required fields, sensitivity labels, allowed readers, and projection rules must be validated before storage."
+    },
+    {
+      "gate": "secret_redaction",
+      "requiredBefore": ["artifact_storage", "memory_promotion", "projection_write"],
+      "rule": "Raw API keys, OAuth tokens, cookies, passwords, recovery codes, private message bodies, and customer credentials are never stored or projected."
+    },
+    {
+      "gate": "source_and_owner",
+      "requiredBefore": ["canonical_memory_write", "filesystem_write"],
+      "rule": "Every write must show source path, destination path, owner, record type, sensitivity, rollback plan, and verification method."
+    },
+    {
+      "gate": "evidence_attached",
+      "requiredBefore": ["verified_status", "routing_decision"],
+      "rule": "Claims about paths, ports, apps, agents, sync jobs, browser state, or GTM status need file evidence, command output, health response, screenshot, or API response."
+    },
+    {
+      "gate": "human_projection_approval",
+      "requiredBefore": ["vanta_brain_projection"],
+      "rule": "VANTA-Brain receives reviewed markdown summaries only after canonical AzA storage and explicit user approval for this pass."
+    }
+  ],
+  "blockedWrites": [
+    {
+      "target": "/Users/growthgod/Documents/VANTA-Brain",
+      "status": "blocked",
+      "reason": "User explicitly prohibited writes during this pass."
+    },
+    {
+      "target": "/Users/growthgod/VAN",
+      "status": "approval_required",
+      "reason": "VAN is the active runtime and implementation workspace. Writes require target, reason, rollback, and approval."
+    },
+    {
+      "target": "/Users/growthgod/VAN/aza_memory",
+      "status": "blocked_until_live",
+      "reason": "AzA memory service ports and schema are not yet verified live."
+    },
+    {
+      "target": "browser_and_device_sessions",
+      "status": "approval_required",
+      "reason": "Posting, messaging, following, purchasing, account changes, or device actions require explicit approval."
+    },
+    {
+      "target": "raw_secret_material",
+      "status": "never_store",
+      "reason": "Secrets stay in auth stores and environment variables. AzA stores only safe pointers and rotation metadata."
+    }
+  ],
+  "currentMode": "read_only_inventory_and_static_artifacts",
+  "futureWritePath": [
+    {
+      "step": "operator_intent",
+      "owner": "LobeHub harness",
+      "output": "Proposed command with lane, target, owner, record type, sensitivity, and approval requirement."
+    },
+    {
+      "step": "executor_validation",
+      "owner": "Codex coding agent",
+      "output": "Real filesystem, process, HTTP, browser, or test evidence attached to the command."
+    },
+    {
+      "step": "approval",
+      "owner": "Human operator",
+      "output": "Explicit approval for writes to VAN, AzA, VANTA-Brain, browser sessions, devices, or customer-facing outputs."
+    },
+    {
+      "step": "canonical_write",
+      "owner": "AzA API or MCP adapter",
+      "output": "Typed canonical record with provenance, permissions, verification status, and projection policy."
+    },
+    {
+      "step": "projection",
+      "owner": "AzA projection worker",
+      "output": "Reviewed markdown summary to VANTA-Brain only when allowed and approved."
+    }
+  ],
+  "harnessRoles": {
+    "aza": {
+      "role": "canonical_brain",
+      "writesAllowedNow": false,
+      "responsibilities": [
+        "typed records",
+        "provenance",
+        "permissions",
+        "indexes",
+        "memory graph",
+        "projection history"
+      ]
+    },
+    "codex": {
+      "role": "coding_agent_executor",
+      "writesAllowedNow": true,
+      "responsibilities": [
+        "code inspection",
+        "implementation",
+        "terminal commands",
+        "validation",
+        "browser smoke checks",
+        "evidence capture"
+      ],
+      "writeBoundary": "Only approved workspace paths. Restricted paths remain read-only or approval-first."
+    },
+    "lobehub": {
+      "role": "harness_command_surface",
+      "writesAllowedNow": true,
+      "responsibilities": [
+        "operator UI",
+        "approvals",
+        "routing context",
+        "boards",
+        "artifact links",
+        "command history"
+      ],
+      "writeBoundary": "Current scoped writes are limited to the LobeHub AzA command-center page and public artifacts."
+    },
+    "vantaBrain": {
+      "role": "human_readable_projection_vault",
+      "writesAllowedNow": false,
+      "responsibilities": ["reviewed summaries", "decisions", "indexes", "documentation"]
+    }
+  },
+  "observedAt": "2026-07-02T17:05:00-04:00",
+  "readAdapters": [
+    {
+      "adapter": "pc_architecture_diagram",
+      "artifact": "/aza/aza-pc-architecture.html",
+      "mode": "read_only_static_archify_diagram",
+      "scope": "Standalone Archify HTML generated from metadata-only architecture JSON to explain the PC command architecture without opening apps, reading browser tabs, reading raw memories, exposing secrets, or writing records."
+    },
+    {
+      "adapter": "app_surface_inventory",
+      "artifact": "/aza/app-surface-inventory.json",
+      "mode": "read_only_snapshot",
+      "scope": "Installed and running desktop app metadata."
+    },
+    {
+      "adapter": "vanta_brain_readonly_audit",
+      "artifact": "/aza/vanta-brain-readonly-audit.json",
+      "mode": "read_only_snapshot",
+      "scope": "Vault counts, sync evidence, script evidence, and coverage gaps."
+    },
+    {
+      "adapter": "live_vanta_brain_coverage_endpoint",
+      "artifact": "/aza/live-vanta-brain-coverage",
+      "mode": "read_only_vanta_brain_coverage_map",
+      "scope": "LobeHub server-side route that compares VANTA-Brain projection folders against Codex, Hermes, agent skill, session, memory, and docs roots using metadata only, without reading raw markdown, session transcripts, skill bodies, secrets, browser tabs, private messages, or writing records."
+    },
+    {
+      "adapter": "gtm_team_operating_model",
+      "artifact": "/aza/gtm-team-operating-model.json",
+      "mode": "static_model",
+      "scope": "Offers, leads, pilots, content campaigns, tasks, daily command logs, and evidence."
+    },
+    {
+      "adapter": "agent_memory_skill_inventory",
+      "artifact": "/aza/agent-memory-skill-inventory.json",
+      "mode": "read_only_snapshot",
+      "scope": "Agent roots, skill roots, session roots, and memory source counts."
+    },
+    {
+      "adapter": "van_project_root_inventory",
+      "artifact": "/aza/van-project-root-inventory.json",
+      "mode": "read_only_snapshot",
+      "scope": "Top-level VAN directories grouped by project, memory, agent, device, UI, content, docs, and unknown lanes."
+    },
+    {
+      "adapter": "local_service_port_inventory",
+      "artifact": "/aza/local-service-port-inventory.json",
+      "mode": "read_only_snapshot",
+      "scope": "Current local listeners, process cwd evidence, expected missing services, and planned AzA ports."
+    },
+    {
+      "adapter": "aza_brain_readiness_audit",
+      "artifact": "/aza/aza-brain-readiness-audit.json",
+      "mode": "read_only_snapshot",
+      "scope": "Actual AzA memory implementation, service surfaces, dirty working tree status, durable-store gaps, MCP/sync/worker readiness, and write blockers."
+    },
+    {
+      "adapter": "aza_goal_completion_audit",
+      "artifact": "/aza/aza-goal-completion-audit.json",
+      "mode": "static_audit",
+      "scope": "Original objective coverage, verified evidence links, live blockers, and proof gates required before completion."
+    },
+    {
+      "adapter": "live_readiness_endpoint",
+      "artifact": "/aza/live-readiness",
+      "mode": "read_only_live_probe",
+      "scope": "LobeHub server-side route that checks expected command-center artifacts and probes AzA localhost health ports without writing data."
+    },
+    {
+      "adapter": "live_operating_board_endpoint",
+      "artifact": "/aza/live-operating-board",
+      "mode": "read_only_derived_board",
+      "scope": "LobeHub server-side route that derives Daily Command, Memory Intake, GTM Pipeline, Content Factory, and Product Delivery cards from approved artifacts and live readiness."
+    },
+    {
+      "adapter": "live_app_map_endpoint",
+      "artifact": "/aza/live-app-map",
+      "mode": "read_only_live_app_map",
+      "scope": "LobeHub server-side route that inventories installed app bundles, safe bundle identifiers, bundle versions, source roots, Chrome/webapp wrapper counts, visible desktop apps, content roles, stages, and automation modes without reading windows, tabs, documents, messages, cookies, tokens, passwords, API keys, or raw login state."
+    },
+    {
+      "adapter": "live_gtm_map_endpoint",
+      "artifact": "/aza/live-gtm-map",
+      "mode": "read_only_live_gtm_map",
+      "scope": "LobeHub server-side route that derives GTM lanes, team ownership, record schemas, approval boundaries, and operating-board status without reading customer private data, raw lead contact details, private messages, credentials, tokens, cookies, or unapproved browser contents."
+    },
+    {
+      "adapter": "live_team_data_routing_endpoint",
+      "artifact": "/aza/live-team-data-routing",
+      "mode": "read_only_live_team_data_routing_map",
+      "scope": "LobeHub server-side route that maps team lanes, record types, handoffs, storage boundaries, owner roles, and blockers for GTM, product, content, operations, and knowledge data without reading customer private data, lead contact details, private messages, browser contents, database contents, credentials, tokens, cookies, or writing records."
+    },
+    {
+      "adapter": "live_daily_command_workflow_endpoint",
+      "artifact": "/aza/live-daily-command-workflow",
+      "mode": "read_only_daily_command_workflow_map",
+      "scope": "LobeHub server-side route that maps the current manual operator-to-LobeHub-to-Codex loop, team cadences, handoffs, evidence rules, memory promotion, content operations, and projection blockers without creating tasks, writing records, reading raw task contents, reading raw memories, opening browser tabs, reading private messages, or exposing secrets."
+    },
+    {
+      "adapter": "live_command_gates_endpoint",
+      "artifact": "/aza/live-command-gates",
+      "mode": "read_only_live_command_gate_map",
+      "scope": "LobeHub server-side route that combines live maps into explicit read gates, blocked writes, approval-required actions, and next proof steps without reading raw secrets, file contents, browser contents, private messages, or customer credentials."
+    },
+    {
+      "adapter": "live_implementation_proof_endpoint",
+      "artifact": "/aza/live-implementation-proof",
+      "mode": "read_only_live_implementation_proof_map",
+      "scope": "LobeHub server-side route that turns current blockers into ordered proof gates before canonical writes, durable boards, MCP-backed reads, or VANTA-Brain projection without starting services, running migrations, reading database contents, or writing files."
+    },
+    {
+      "adapter": "live_aza_verification_runbook_endpoint",
+      "artifact": "/aza/live-aza-verification-runbook",
+      "mode": "read_only_aza_verification_runbook_map",
+      "scope": "LobeHub server-side route that maps exact AzA service health probes, approval-required VAN commands, Postgres and pgvector checks, MCP tool verification, shared-store proof, expected evidence, and safety boundaries without running VAN commands, starting services, connecting to databases, reading rows, exposing secrets, or writing records."
+    },
+    {
+      "adapter": "live_mcp_tooling_map_endpoint",
+      "artifact": "/aza/live-mcp-tooling-map",
+      "mode": "read_only_mcp_tooling_map",
+      "scope": "LobeHub server-side route that inventories MCP client config presence, safe top-level server names, AzA MCP implemented and placeholder tool names, tooling channels, and proof gates without exposing MCP command strings, command arguments, environment values, tokens, cookies, passwords, tool payloads, database contents, or writing records."
+    },
+    {
+      "adapter": "live_canonical_store_endpoint",
+      "artifact": "/aza/live-canonical-store",
+      "mode": "read_only_canonical_store_readiness_map",
+      "scope": "LobeHub server-side route that checks required environment presence, supported database driver, source file pointers, and canonical-store proof tasks without exposing secret values, opening database sessions, running migrations, reading database contents, or writing files."
+    },
+    {
+      "adapter": "live_codex_harness_endpoint",
+      "artifact": "/aza/live-codex-harness",
+      "mode": "read_only_codex_harness_bridge_map",
+      "scope": "LobeHub server-side route that maps the LobeHub command surface, Codex executor, task/runtime primitives, approval lanes, and evidence handoff without creating tasks, invoking Codex, running shell commands, reading raw task contents, opening browser tabs, or writing records."
+    },
+    {
+      "adapter": "live_command_record_schema_endpoint",
+      "artifact": "/aza/live-command-record-schema",
+      "mode": "read_only_command_record_schema_map",
+      "scope": "LobeHub server-side route that defines command, approval, Codex execution, evidence, GTM, content, memory promotion, and projection record schemas without creating records, reading task contents, reading database contents, or writing files."
+    },
+    {
+      "adapter": "live_communication_protocols_endpoint",
+      "artifact": "/aza/live-communication-protocols",
+      "mode": "read_only_communication_protocol_map",
+      "scope": "LobeHub server-side route that maps communication channels between operator, LobeHub, Codex, VAN, AzA API, MCP, Postgres, agent runtimes, content apps, local services, and VANTA-Brain without reading request bodies, database contents, browser tabs, private messages, or writing records."
+    },
+    {
+      "adapter": "live_memory_intake_funnel_endpoint",
+      "artifact": "/aza/live-memory-intake-funnel",
+      "mode": "read_only_memory_intake_funnel_map",
+      "scope": "LobeHub server-side route that maps how granular Codex, Hermes, agent skill, project, app, GTM, and projection sources feed the unified AzA brain through metadata-only intake, access review, evidence, canonical write, MCP retrieval, and projection gates without reading raw memories, sessions, skill bodies, browser tabs, private messages, database contents, secrets, or writing records."
+    },
+    {
+      "adapter": "live_brain_topology_endpoint",
+      "artifact": "/aza/live-brain-topology",
+      "mode": "read_only_live_brain_topology_map",
+      "scope": "LobeHub server-side route that models the hybrid AzA brain, granular agent/session namespaces, access profiles, and promotion pipeline without reading raw memories, sessions, skill bodies, secrets, private messages, or customer credentials."
+    },
+    {
+      "adapter": "live_agent_access_matrix_endpoint",
+      "artifact": "/aza/live-agent-access-matrix",
+      "mode": "read_only_live_agent_access_matrix_map",
+      "scope": "LobeHub server-side route that maps agents and runtime roles to readable namespaces, writable lanes, session scopes, and approval requirements without reading raw memories, sessions, skill bodies, secrets, browser tabs, private messages, or customer credentials."
+    },
+    {
+      "adapter": "live_agent_fleet_map_endpoint",
+      "artifact": "/aza/live-agent-fleet-map",
+      "mode": "read_only_live_agent_fleet_map",
+      "scope": "LobeHub server-side route that inventories Hermes agent directories, skill roots, manifest-file presence, namespace routes, and agent categories without reading raw agent files, raw skill bodies, raw sessions, raw memories, browser tabs, private messages, database contents, credentials, tokens, cookies, or writing records."
+    },
+    {
+      "adapter": "live_content_ops_endpoint",
+      "artifact": "/aza/live-content-ops",
+      "mode": "read_only_live_content_ops_map",
+      "scope": "LobeHub server-side route that maps content apps into production stages, approval queues, registry gaps, and future AzA write-back records without reading app windows, browser tabs, documents, messages, generated media contents, cookies, tokens, passwords, API keys, or raw login state."
+    },
+    {
+      "adapter": "live_content_app_audit_endpoint",
+      "artifact": "/aza/live-content-app-audit",
+      "mode": "read_only_live_content_app_audit_map",
+      "scope": "LobeHub server-side route that identifies missing account labels, auth pointers, output paths, output kinds, evidence pointers, and approval gates for content-generation apps without opening apps, reading browser tabs, reading documents, inspecting private messages, reading generated media contents, reading exported files, exposing secrets, or writing records."
+    },
+    {
+      "adapter": "live_access_capability_map_endpoint",
+      "artifact": "/aza/live-access-capability-map",
+      "mode": "read_only_access_capability_map",
+      "scope": "LobeHub server-side route that explains what browser, Electron, content, communication, coding, and device apps can safely do after login using capability labels, audit statuses, required gates, and blocked-action labels without reading actual login state, tabs, documents, messages, cookies, tokens, passwords, browser profile contents, generated media contents, exported file contents, or writing records."
+    },
+    {
+      "adapter": "live_ownership_resolution_endpoint",
+      "artifact": "/aza/live-ownership-resolution",
+      "mode": "read_only_live_ownership_resolution_map",
+      "scope": "LobeHub server-side route that resolves source-of-truth ownership, ambiguous roots, write lanes, and approval policies without reading file contents, raw memories, sessions, browser tabs, private messages, customer credentials, or secrets."
+    },
+    {
+      "adapter": "live_project_map_endpoint",
+      "artifact": "/aza/live-project-map",
+      "mode": "read_only_live_project_map",
+      "scope": "LobeHub server-side route that refreshes VAN, LobeHub, and Desktop/VAN top-level project roots, broad categories, and safe marker existence without reading file contents, env files, raw secrets, git remotes, private messages, or customer credentials."
+    },
+    {
+      "adapter": "live_workspace_root_reconciliation_endpoint",
+      "artifact": "/aza/live-workspace-root-reconciliation",
+      "mode": "read_only_workspace_root_reconciliation_map",
+      "scope": "LobeHub server-side route that reconciles LobeHub, VAN, AzA memory, VANTA-Brain, Desktop/VAN, Codex, Hermes, and agent skill roots using marker presence, Git branch names from HEAD, top-level counts, service listener counts, and ownership policy without reading source contents, env files, git remotes, raw memories, browser tabs, private messages, or secrets."
+    },
+    {
+      "adapter": "live_architecture_data_flow_endpoint",
+      "artifact": "/aza/live-architecture-data-flow",
+      "mode": "read_only_live_architecture_data_flow_map",
+      "scope": "LobeHub server-side route that maps operator intent, LobeHub harness routing, Codex execution, VAN runtime boundaries, agent memory overlays, AzA canonical brain targets, GTM/team records, content app surfaces, local services, and VANTA-Brain projection as metadata-only nodes, edges, gates, payload classes, approval rules, and blockers without reading raw source, raw memories, raw sessions, raw skill bodies, app windows, browser tabs, private messages, documents, cookies, tokens, passwords, or writing records."
+    },
+    {
+      "adapter": "live_aza_implementation_endpoint",
+      "artifact": "/aza/live-aza-implementation",
+      "mode": "read_only_aza_implementation_map",
+      "scope": "LobeHub server-side route that inspects /Users/growthgod/VAN/aza_memory implementation metadata, expected service entrypoints, listener presence by port, package script names, dependency names, env variable names from .env.example, database table export names, compose service names, healthcheck service names, localhost port bindings, init SQL mount paths, migration file metadata, migration table statement names, API capability labels, and MCP tool names without returning raw source, raw docker-compose contents, raw migration SQL contents, raw .env files, environment values, database contents, raw conversations, private messages, browser profiles, credentials, tokens, cookies, or writing records."
+    },
+    {
+      "adapter": "live_memory_map_endpoint",
+      "artifact": "/aza/live-memory-map",
+      "mode": "read_only_live_memory_map",
+      "scope": "LobeHub server-side route that counts Codex, Hermes, agent skill, session, memory, and VANTA-Brain projection roots without reading raw skill bodies, memories, sessions, secrets, private messages, or customer credentials."
+    },
+    {
+      "adapter": "live_service_map_endpoint",
+      "artifact": "/aza/live-service-map",
+      "mode": "read_only_live_service_map",
+      "scope": "LobeHub server-side route that inventories current TCP listeners, expected services, process cwd ownership, and unknown local listeners without reading command arguments, environment variables, secrets, browser contents, or database contents."
+    },
+    {
+      "adapter": "live_system_map_endpoint",
+      "artifact": "/aza/live-system-map",
+      "mode": "read_only_system_map",
+      "scope": "LobeHub server-side route that combines root checks, service readiness, board state, app inventory, memory ownership, and communication edges without writing data."
+    },
+    {
+      "adapter": "live_goal_completion_audit_endpoint",
+      "artifact": "/aza/live-goal-completion-audit",
+      "mode": "read_only_live_goal_completion_audit",
+      "scope": "LobeHub server-side route that derives requirement-by-requirement completion status for the active AzA architecture goal from current live map summaries without reading raw memories, sessions, browser contents, database rows, secrets, or writing records."
+    },
+    {
+      "adapter": "live_execution_sequence_endpoint",
+      "artifact": "/aza/live-execution-sequence",
+      "mode": "read_only_execution_sequence_map",
+      "scope": "LobeHub server-side route that orders the next approval, AzA service, canonical store, MCP, LobeHub adapter, Codex handoff, content app, GTM/team data, and VANTA-Brain projection proof steps without running commands, opening database sessions, reading private contents, exposing secrets, or writing records."
+    },
+    {
+      "adapter": "live_approval_packet_endpoint",
+      "artifact": "/aza/live-approval-packet",
+      "mode": "read_only_approval_packet_map",
+      "scope": "LobeHub server-side route that turns the current approval-gated AzA runtime verification, content app metadata audit, and deferred VANTA-Brain projection blockers into exact approval text, allowed command class labels, blocked command class labels, evidence rules, rollback labels, and command previews without running commands, opening database sessions, reading private contents, exposing secrets, or writing records."
+    },
+    {
+      "adapter": "live_delivery_roadmap_endpoint",
+      "artifact": "/aza/live-delivery-roadmap",
+      "mode": "read_only_delivery_roadmap_map",
+      "scope": "LobeHub server-side route that composes operating board, GTM, team data, implementation proof, and approval packet evidence into build milestones and workstreams for command center, runtime verification, canonical brain, LobeHub adapters, durable boards, GTM, content operations, and projection without running commands, opening database sessions, reading private contents, exposing secrets, or writing records."
+    },
+    {
+      "adapter": "live_browser_task_tooling_endpoint",
+      "artifact": "/aza/live-browser-task-tooling-map",
+      "mode": "read_only_browser_task_tooling_map",
+      "scope": "LobeHub server-side route that recommends Browser Plugin, Computer Use, Chrome CDP/Electron RPC, MCP tools, and Codex executor routing by task class, while preserving AzA as the durable memory source of truth and excluding browser cookies, authorization headers, OAuth tokens, private page contents, raw sessions, raw memories, and state-changing browser actions."
+    },
+    {
+      "adapter": "live_tooling_recommendation_plan_endpoint",
+      "artifact": "/aza/live-tooling-recommendation-plan",
+      "mode": "read_only_tooling_recommendation_plan_map",
+      "scope": "LobeHub server-side route that turns the Browser Plugin, Computer Use, Chrome CDP/Electron RPC, MCP tools, Codex executor, canonical AzA memory, and VANTA-Brain projection recommendation into an ordered operator plan without running commands, reading private browser contents, opening database sessions, exposing secrets, or writing records."
+    }
+  ],
+  "recordTypes": [
+    "project",
+    "agent",
+    "skill",
+    "session",
+    "memory_source",
+    "brain_namespace",
+    "access_profile",
+    "agent_access_row",
+    "namespace_access_summary",
+    "agent_fleet_source",
+    "agent_fleet_agent",
+    "agent_fleet_namespace_route",
+    "promotion_step",
+    "implementation_proof_gate",
+    "implementation_phase",
+    "aza_verification_service_contract",
+    "aza_verification_step",
+    "canonical_store_check",
+    "canonical_store_env_check",
+    "codex_harness_primitive",
+    "codex_harness_lane",
+    "codex_handoff_step",
+    "operator_command",
+    "approval_decision",
+    "codex_execution_run",
+    "evidence_receipt",
+    "memory_promotion",
+    "projection_request",
+    "command_schema_field",
+    "command_record_lifecycle_step",
+    "communication_protocol",
+    "memory_intake_source",
+    "memory_intake_stage",
+    "memory_namespace_route",
+    "vanta_brain_coverage_target",
+    "vanta_brain_projection_entry",
+    "vanta_brain_coverage_gap",
+    "content_app_audit_target",
+    "content_app_audit_field",
+    "content_app_audit_lane",
+    "access_capability_surface",
+    "access_capability_lane",
+    "team_data_lane_route",
+    "team_record_route",
+    "team_handoff_route",
+    "team_storage_boundary",
+    "daily_command_workflow_stage",
+    "daily_command_cadence",
+    "daily_command_handoff",
+    "content_stage",
+    "content_app_operation",
+    "content_write_back_step",
+    "ownership_decision",
+    "ownership_conflict",
+    "write_lane",
+    "workspace_root_state",
+    "workspace_root_decision",
+    "workspace_communication_path",
+    "architecture_flow_node",
+    "architecture_flow_edge",
+    "architecture_gate",
+    "aza_implementation_file",
+    "aza_implementation_service",
+    "aza_implementation_capability",
+    "aza_implementation_package",
+    "app_surface",
+    "service",
+    "offer",
+    "lead",
+    "pilot",
+    "content_campaign",
+    "task",
+    "evidence",
+    "decision",
+    "artifact",
+    "credential_pointer"
+  ],
+  "summary": "LobeHub is the harness. Codex is the coding executor inside the harness. AzA is the canonical brain target. VANTA-Brain is a reviewed projection vault. The command center is currently read-only for system inventories and blocked from writing canonical memory until AzA services and approval gates are verified."
+}

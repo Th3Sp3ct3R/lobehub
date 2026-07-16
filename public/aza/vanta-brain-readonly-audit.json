@@ -1,0 +1,184 @@
+{
+  "evidenceFilesRead": [
+    "/Users/growthgod/Documents/VANTA-Brain/scripts/vanta-sync.sh",
+    "/Users/growthgod/Documents/VANTA-Brain/scripts/hermes-export.sh",
+    "/Users/growthgod/Documents/VANTA-Brain/scripts/lobe-export.sh",
+    "/Users/growthgod/Documents/VANTA-Brain/scripts/openclaw-export.sh",
+    "/Users/growthgod/Documents/VANTA-Brain/.sync.log",
+    "/Users/growthgod/Documents/VANTA-Brain/decisions/2026-05-18-brain-sync-mechanism.md",
+    "/Users/growthgod/Documents/VANTA-Brain/AGENT_ARCHITECTURE.md",
+    "/Users/growthgod/Documents/VANTA-Brain/02-agents/agent-roster.md",
+    "/Users/growthgod/Documents/VANTA-Brain/Memory/MEMORY.md"
+  ],
+  "gaps": [
+    {
+      "gap": "Agent skills are not fully represented in the vault",
+      "evidence": "2028 directories were observed under ~/.agents/skills while only 122 skill-named files were found in VANTA-Brain."
+    },
+    {
+      "gap": "Hermes sessions are not proven fully mirrored",
+      "evidence": "3996 Hermes session files were observed versus 3329 VANTA-Brain session files."
+    },
+    {
+      "gap": "LobeHub topic export is not proven live",
+      "evidence": "The Lobe export script requires a lobehub CLI, and prior inspection showed no lobehub binary on PATH."
+    },
+    {
+      "gap": "Documented sync mechanism does not match installed launchd label",
+      "evidence": "Decision file references com.vanta.brain.sync, but launchd only reported com.growthgod.vanta-sync."
+    },
+    {
+      "gap": "Vault memory file is too small to be canonical",
+      "evidence": "Memory/MEMORY.md was 140 bytes and contained only a small Hermes Memory stub."
+    }
+  ],
+  "largestAreasByFileCount": [
+    { "name": "04-sessions", "files": 3329 },
+    { "name": "07-ops", "files": 2410 },
+    { "name": "08-gitgod", "files": 1653 },
+    { "name": "_repos", "files": 716 },
+    { "name": "odysseus", "files": 212 },
+    { "name": "docs", "files": 143 },
+    { "name": "OpenRouter", "files": 72 },
+    { "name": "openclaw", "files": 68 },
+    { "name": "git-log", "files": 51 },
+    { "name": "agent-archive", "files": 49 },
+    { "name": "02-agents", "files": 45 },
+    { "name": "Daily Notes", "files": 42 }
+  ],
+  "observedAt": "2026-07-02T16:40:00-04:00",
+  "observedCounts": {
+    "vaultFiles": 9053,
+    "vaultDirectories": 411,
+    "vaultDirectEntries": 66,
+    "vantaSessionFiles": 3329,
+    "vantaDistilledSessionFiles": 3145,
+    "hermesSessionFiles": 3996,
+    "hermesAgents": 34,
+    "hermesSkills": 65,
+    "codexSkills": 37,
+    "agentSkills": 2028,
+    "vantaSkillNamedFiles": 122
+  },
+  "paths": {
+    "vault": "/Users/growthgod/Documents/VANTA-Brain",
+    "activeProjectRoot": "/Users/growthgod/VAN",
+    "commandUi": "/Users/growthgod/lobehub",
+    "hermesRuntime": "/Users/growthgod/.hermes",
+    "codexRuntime": "/Users/growthgod/.codex",
+    "agentSkills": "/Users/growthgod/.agents/skills"
+  },
+  "recommendedNextActions": [
+    "Treat VANTA-Brain as a reviewed projection vault until AzA owns canonical typed records.",
+    "Build a read-only AzA adapter that inventories VANTA-Brain files, sync stamps, and launchd status.",
+    "Build separate adapters for ~/.agents/skills, ~/.codex/skills, ~/.hermes/agents, ~/.hermes/skills, and ~/.hermes/sessions.",
+    "Repair or replace LobeHub export with an approved current API or local export path.",
+    "Make every projected vault file link back to an AzA canonical record, source path, timestamp, sensitivity label, and verification status."
+  ],
+  "schemaVersion": "0.1.0",
+  "source": "read-only filesystem and launchd inspection",
+  "syncMechanisms": [
+    {
+      "name": "vanta-sync.sh",
+      "path": "/Users/growthgod/Documents/VANTA-Brain/scripts/vanta-sync.sh",
+      "mtime": "2026-06-23T18:49:13-04:00",
+      "role": "Runs OpenClaw, Hermes, and LobeHub exports into the vault."
+    },
+    {
+      "name": "hermes-export.sh",
+      "path": "/Users/growthgod/Documents/VANTA-Brain/scripts/hermes-export.sh",
+      "role": "Exports Hermes cron job output markdown into VANTA-Brain/07-ops/hermes. It does not prove full Hermes agents, skills, or sessions are mirrored."
+    },
+    {
+      "name": "lobe-export.sh",
+      "path": "/Users/growthgod/Documents/VANTA-Brain/scripts/lobe-export.sh",
+      "role": "Exports LobeHub topics using a lobehub CLI. Previous inspection showed the CLI was not available on PATH."
+    },
+    {
+      "name": "openclaw-export.sh",
+      "path": "/Users/growthgod/Documents/VANTA-Brain/scripts/openclaw-export.sh",
+      "role": "Exports OpenClaw workspace markdown, per-agent markdown, and conversation summaries from ~/.openclaw/lcm.sqlite when present."
+    }
+  ],
+  "syncStatus": {
+    "vantaSyncLog": {
+      "path": "/Users/growthgod/Documents/VANTA-Brain/.sync.log",
+      "mtime": "2026-06-17T10:06:07-04:00",
+      "notes": [
+        "Log contains many 'Already up to date' entries.",
+        "Log contains repeated 'fatal: Cannot rebase onto multiple branches.' entries."
+      ]
+    },
+    "documentedLaunchdJob": {
+      "label": "com.vanta.brain.sync",
+      "status": "not-found",
+      "note": "Documented hourly job from the decision file was not found in the current user launchd domain."
+    },
+    "installedLaunchdJob": {
+      "label": "com.growthgod.vanta-sync",
+      "status": "loaded-not-running",
+      "schedule": "daily at 02:00",
+      "reportedRuns": 0,
+      "stdout": "/Users/growthgod/Documents/VANTA-Brain/.sync.log",
+      "stderr": "/Users/growthgod/Documents/VANTA-Brain/.sync.log"
+    },
+    "lastSyncStamps": [
+      {
+        "path": "/Users/growthgod/Documents/VANTA-Brain/04-sessions/lobe/.last_sync",
+        "timestamp": "2026-06-23T18:49:06-04:00"
+      },
+      {
+        "path": "/Users/growthgod/Documents/VANTA-Brain/07-ops/hermes/.last_sync",
+        "timestamp": "2026-06-23T15:18:47-04:00"
+      }
+    ],
+    "tmpLaunchdLog": {
+      "path": "/tmp/vanta-brain-sync.log",
+      "status": "missing"
+    }
+  },
+  "topLevelDirectories": [
+    ".git",
+    ".obsidian",
+    "00-inbox",
+    "01-projects",
+    "02-agents",
+    "03-architecture",
+    "04-music",
+    "04-sessions",
+    "05-fleet",
+    "06-clients",
+    "07-ops",
+    "08-gitgod",
+    "Agents",
+    "Architecture",
+    "Daily",
+    "Daily Notes",
+    "MCP",
+    "Memory",
+    "OpenRouter",
+    "Orchestrators",
+    "Projects",
+    "Research",
+    "Tasks",
+    "Vercel",
+    "_repos",
+    "_system",
+    "agent-archive",
+    "decisions",
+    "docs",
+    "git-log",
+    "hermes",
+    "logs",
+    "odysseus",
+    "openclaw",
+    "scripts",
+    "templates"
+  ],
+  "verdict": {
+    "status": "partial-stale-projection",
+    "summary": "VANTA-Brain contains a substantial readable projection of sessions, docs, decisions, ops, GitGod indexes, and agent notes, but current evidence does not prove it is the canonical or complete memory source for all agents, skills, sessions, docs, and LobeHub topics.",
+    "recommendedRole": "human-readable projection vault",
+    "notRecommendedRole": "canonical runtime memory database"
+  }
+}

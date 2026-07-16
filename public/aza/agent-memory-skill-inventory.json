@@ -1,0 +1,243 @@
+{
+  "agentMemoryRecordSchema": {
+    "agent": [
+      "id",
+      "name",
+      "runtime",
+      "role",
+      "sourcePath",
+      "skillRoots",
+      "sessionRoots",
+      "memoryRoots",
+      "allowedTools",
+      "allowedReaders",
+      "approvalLevel",
+      "status",
+      "lastVerifiedAt"
+    ],
+    "skill": [
+      "id",
+      "name",
+      "runtime",
+      "sourcePath",
+      "entrypointPath",
+      "capability",
+      "ownerAgent",
+      "allowedAgents",
+      "allowedProjects",
+      "sensitivity",
+      "version",
+      "lastVerifiedAt"
+    ],
+    "session": [
+      "id",
+      "runtime",
+      "sourcePath",
+      "startedAt",
+      "endedAt",
+      "agentIds",
+      "projectIds",
+      "summary",
+      "decisions",
+      "artifactIds",
+      "promotedFactIds",
+      "sensitivity",
+      "verificationStatus"
+    ],
+    "memory_source": [
+      "id",
+      "runtime",
+      "sourcePath",
+      "sourceKind",
+      "ownerAgent",
+      "recordCount",
+      "lastModifiedAt",
+      "conflictState",
+      "promotionPolicy",
+      "projectionPolicy"
+    ]
+  },
+  "nextActions": [
+    "Build a read-only LobeHub adapter that refreshes these counts and root statuses.",
+    "Create AzA tables or typed records for agent, skill, session, memory_source, artifact, and promoted_fact.",
+    "Connect Codex as the coding executor so it can inspect sources and attach evidence back to LobeHub/AzA.",
+    "Add per-agent access labels before using memory to route work automatically.",
+    "Reconcile VANTA-Brain projections against AzA records instead of treating vault files as canonical."
+  ],
+  "observedAt": "2026-07-02T16:50:00-04:00",
+  "privacy": {
+    "captured": [
+      "counts",
+      "root paths",
+      "directory names",
+      "representative agent names",
+      "representative skill names",
+      "mtime windows",
+      "indexing policy"
+    ],
+    "excluded": [
+      "raw memory contents",
+      "raw session transcripts",
+      "secrets",
+      "tokens",
+      "cookies",
+      "private messages",
+      "customer credentials"
+    ]
+  },
+  "representativeCodexSkills": [
+    "agent-development",
+    "agents-sdk",
+    "atlas",
+    "cloudflare",
+    "codex-primary-runtime",
+    "frontend-design",
+    "mcp-integration",
+    "notion-knowledge-capture",
+    "playwright",
+    "render-deploy",
+    "skill-lookup",
+    "sora",
+    "test-driven-development",
+    "transcribe",
+    "vercel-deploy"
+  ],
+  "representativeHermesAgents": [
+    "metatron",
+    "michael",
+    "raphael",
+    "gabriel",
+    "raziel",
+    "sandalphon",
+    "solomon",
+    "sp3ct3r",
+    "sh3dw",
+    "sh3my4z4",
+    "codex-orchestrator",
+    "codex-researcher",
+    "codex-lorist",
+    "codex-imager",
+    "codex-videographer"
+  ],
+  "representativeHermesSkills": [
+    "codex-pipeline",
+    "computer-use",
+    "gitgod",
+    "github",
+    "graphiti",
+    "growthgod",
+    "mcp",
+    "music-creation",
+    "openhuman",
+    "ops",
+    "research",
+    "session-memory",
+    "social-media",
+    "software-development",
+    "vanta-brain-query",
+    "vmos-device-control"
+  ],
+  "roots": [
+    {
+      "id": "agent_skills",
+      "path": "/Users/growthgod/.agents/skills",
+      "role": "Large external/local skill catalog for specialized agent capabilities.",
+      "directSkillDirectories": 2028,
+      "skillMarkdownFiles": 2023,
+      "filesModifiedLast7Days": 3411,
+      "directoriesModifiedLast7Days": 3523,
+      "azARecordType": "skill",
+      "indexPolicy": "Index metadata, capability, owner, path, version, and allowed agents. Do not inline full skill bodies unless explicitly approved."
+    },
+    {
+      "id": "codex_skills",
+      "path": "/Users/growthgod/.codex/skills",
+      "role": "Codex-local skill catalog and system skills.",
+      "directSkillDirectories": 37,
+      "skillMarkdownFiles": 40,
+      "filesModifiedLast7Days": 74,
+      "directoriesModifiedLast7Days": 30,
+      "azARecordType": "skill",
+      "indexPolicy": "Index entrypoints, source roots, skill purpose, and safe invocation metadata for the Codex coding-agent lane."
+    },
+    {
+      "id": "hermes_agents",
+      "path": "/Users/growthgod/.hermes/agents",
+      "role": "Hermes agent fleet runtime definitions.",
+      "agentDirectories": 34,
+      "filesModifiedLast7Days": 0,
+      "directoriesModifiedLast7Days": 1,
+      "azARecordType": "agent",
+      "indexPolicy": "Index agent identity, role, allowed tools, memory scope, task lane, and source path."
+    },
+    {
+      "id": "hermes_skills",
+      "path": "/Users/growthgod/.hermes/skills",
+      "role": "Hermes reusable skills and domain-specific procedures.",
+      "skillDirectories": 65,
+      "filesModifiedLast7Days": 142,
+      "directoriesModifiedLast7Days": 74,
+      "azARecordType": "skill",
+      "indexPolicy": "Index skill metadata and domain lane; keep execution files in Hermes until promoted or refactored."
+    },
+    {
+      "id": "hermes_sessions",
+      "path": "/Users/growthgod/.hermes/sessions",
+      "role": "Hermes session archive and runtime evidence.",
+      "sessionFiles": 3996,
+      "filesModifiedLast7Days": 283,
+      "directoriesModifiedLast7Days": 1,
+      "azARecordType": "session",
+      "indexPolicy": "Index session metadata, summaries, decisions, artifacts, and promoted facts. Avoid dumping raw sessions into global memory."
+    },
+    {
+      "id": "hermes_memories",
+      "path": "/Users/growthgod/.hermes/memories",
+      "role": "Hermes memory files and backups.",
+      "memoryFiles": 30,
+      "filesModifiedLast7Days": 10,
+      "directoriesModifiedLast7Days": 1,
+      "azARecordType": "memory_source",
+      "indexPolicy": "Index memory file metadata and conflicts first; promote verified durable facts into AzA records."
+    },
+    {
+      "id": "codex_memories",
+      "path": "/Users/growthgod/.codex/memories",
+      "role": "Codex memory summary, rollout summaries, skill memory, and ad-hoc memory extensions.",
+      "memoryFiles": 106,
+      "filesModifiedLast7Days": 106,
+      "directoriesModifiedLast7Days": 63,
+      "azARecordType": "memory_source",
+      "indexPolicy": "Index summaries, rollout identifiers, evidence pointers, and current-goal relevance. Treat as coding-agent memory, not the whole brain."
+    }
+  ],
+  "routingPolicy": [
+    {
+      "rule": "global_facts_to_aza",
+      "description": "Architecture decisions, GTM strategy, verified paths, app inventory, project status, and customer proof should become canonical AzA records."
+    },
+    {
+      "rule": "local_skills_stay_scoped",
+      "description": "Skill bodies and tool procedures stay in their native root unless the user approves copying or refactoring them."
+    },
+    {
+      "rule": "sessions_promote_summaries",
+      "description": "Raw sessions remain runtime evidence. AzA stores session metadata, summaries, decisions, artifacts, and promoted facts."
+    },
+    {
+      "rule": "permissions_follow_agent_and_project",
+      "description": "Every record should include agent, project, session, sensitivity, allowed readers, and allowed actions."
+    },
+    {
+      "rule": "projection_after_verification",
+      "description": "VANTA-Brain receives reviewed markdown projections only after AzA has source path, timestamp, owner, and verification status."
+    }
+  ],
+  "schemaVersion": "0.1.0",
+  "source": "read-only filesystem inventory of local agent, skill, session, and memory roots",
+  "verdict": {
+    "recommendedBrainModel": "hybrid",
+    "summary": "Use AzA as one canonical typed memory and retrieval layer, while preserving granular per-agent skills, prompts, tool rules, sessions, and working memory in their native runtime roots.",
+    "reason": "The machine already has multiple large specialized skill and session stores. Copying them into separate full brains would fragment durable knowledge; flattening them into one unscoped blob would erase permissions, ownership, and agent specialization."
+  }
+}
